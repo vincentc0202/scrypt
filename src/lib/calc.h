@@ -3,15 +3,12 @@
 
 #include "Token.h" 
 #include "lex.h"
-#include <map>
-#include <iostream>
-#include <vector>
-#include <stdexcept>
-#include <memory>
-#include <cmath>
-#include <variant>
+#include "Value.h"
 
-using Value = std::variant<double, bool>;
+#include <map>
+#include <stdexcept>
+#include <cmath>
+
 
 
 class ASTNode {
