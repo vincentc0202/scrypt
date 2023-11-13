@@ -31,6 +31,9 @@ enum type {
     printStatement,
     comma,
     semicolon,
+    functionDefinitionStatement,
+    returnStatement, 
+    null,
     end
 };
 

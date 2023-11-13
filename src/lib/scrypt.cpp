@@ -2,6 +2,13 @@
 
 Parser parser;
 
+/*void Scrypt::interpretFunc(const functiondef & funcNode){
+    //initialize parameters and excute stamblock
+
+    interpret(funcNode);
+}*/
+
+
 void Scrypt::deleteBlock(std::vector<Token>& tokens) {
     //deletes openCurly and every expression until it reaches its corresponding end curly and deletes that
     tokens.pop_back();
@@ -176,6 +183,13 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
 
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
         }
+        //funcdef
+        else if (tokens.back().type_ == functionDefinitionStatement){
+            //interpret();
+        }
+
+
+
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;
 

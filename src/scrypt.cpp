@@ -1,9 +1,11 @@
 #include "lib/scrypt.h"
 
+
 int main () {
     std::string result = "";
     std::istream& input_stream = std::cin;
     char character;
+
 
     while (input_stream.get(character)) {
         result += character;
@@ -32,7 +34,7 @@ int main () {
         std::cout << "Runtime error: " << e.what() << '\n';
         return 3;
     }
-    
+
 
     return 0;
 }

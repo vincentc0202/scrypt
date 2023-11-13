@@ -13,6 +13,7 @@
 
 using Value = std::variant<double, bool>;
 
+
 class ASTNode {
 public:
     std::string type;
@@ -20,6 +21,30 @@ public:
     virtual ~ASTNode() = default;
     virtual Value evaluate() { return 0.0; }
     virtual void printInfix() = 0;
+};
+
+//new classes
+class ParamNode {
+public:
+    std::string name;
+    std::string type;
+    
+};
+
+class funcdef : public ASTNode {
+    std::string funcname;
+    std::vector<ParamNode> paramet;
+    std::vector<Token> stamblock;
+
+public:
+
+};
+
+class returnNode : public ASTNode {
+    std::vector<Token> returnexp;
+
+public:
+
 };
 
 class UnexpToken : public std::runtime_error {
