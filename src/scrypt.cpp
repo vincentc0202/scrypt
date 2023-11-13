@@ -1,7 +1,5 @@
 #include "lib/scrypt.h"
 
-
-
 int main () {
     std::string result = "";
     std::istream& input_stream = std::cin;
