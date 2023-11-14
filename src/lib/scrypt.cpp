@@ -185,10 +185,13 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
         }
         //funcdef
         else if (tokens.back().type_ == functionDefinitionStatement){
+            //initialize a new local map for just that function
             //interpret();
+            //check the next token --> function name -> "foo"
+            //check the next tokens that are within the parenthesis --> vector of variable nodes
+            //block --> interpret? but you need to account for local map
+            
         }
-
-
 
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;

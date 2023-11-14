@@ -12,6 +12,6 @@ class Function;
 using Value = std::variant<double, bool>;
 using Array = std::shared_ptr<std::vector<Value>>;
 using FunctionPtr = std::shared_ptr<Function>;
-//using Value = std::variant<double, bool, std::nullptr_t, std::shared_ptr<Function>, std::shared_ptr<std::vector<Value>>>;
+//using Value = std::variant<double, bool, std::nullptr_t, std::shared_ptr<FunctionNode>, std::shared_ptr<std::vector<Value>>>;
 
 #endif

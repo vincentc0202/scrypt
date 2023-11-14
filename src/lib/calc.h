@@ -10,7 +10,6 @@
 #include <cmath>
 
 
-
 class ASTNode {
 public:
     std::string type;
@@ -19,31 +18,6 @@ public:
     virtual Value evaluate() { return 0.0; }
     virtual void printInfix() = 0;
 };
-
-//new classes
-class ParamNode {
-public:
-    std::string name;
-    std::string type;
-    
-};
-
-class funcdef : public ASTNode {
-    std::string funcname;
-    std::vector<ParamNode> paramet;
-    std::vector<Token> stamblock;
-
-public:
-
-};
-
-class returnNode : public ASTNode {
-    std::vector<Token> returnexp;
-
-public:
-
-};
-
 class UnexpToken : public std::runtime_error {
 public:
     UnexpToken(const std::string& error) : std::runtime_error(error) {}
@@ -447,6 +421,32 @@ public:
         std::cout << " | ";
     }
 };
+
+class FunctionNode : public ASTNode {
+    std::string name;
+    std::vector<VariableNode> parameters;
+    std::vector<Token> statementBlock;
+
+    public:
+    FunctionNode(std::string n, std::vector<VariableNode> param, std::vector<Token> block) : name(n), parameters(param), statementBlock(block) {
+        type == "function";
+    }
+    
+
+
+};
+
+class ReturnNode : public ASTNode {
+    std::vector<ASTNode> returnExpression;
+
+    public:
+    ReturnNode(std::vector<ASTNode> returnExpression) {
+        
+    }
+
+};
+
+
 
 class Parser {
  
