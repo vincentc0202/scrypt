@@ -49,6 +49,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
 
     while (tokens.size() > 1) { 
         std::vector<Token> tempTokens;
+        //std::vector<std::shared_ptr<FunctionNode>> functionList;
         size_t pos = 0;
 
         if (tokens.back().type_ == ifStatement) {
@@ -184,15 +185,52 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
         }
         //funcdef
-        else if (tokens.back().type_ == functionDefinitionStatement){
-            //initialize a new local map for just that function
-            //interpret();
-            //check the next token --> function name -> "foo"
-            //check the next tokens that are within the parenthesis --> vector of variable nodes
-            //block --> interpret? but you need to account for local map
-            
-        }
+        // else if (tokens.back().type_ == functionDefinitionStatement){
+        //     std::string funcName;
+        //     std::vector<std::unique_ptr<VariableNode>> parameters;
+        //     std::vector<Token> block;
 
+        //     tokens.pop_back();
+
+        //     //process funcName;
+        //     funcName = tokens.back().value;
+        //     tokens.pop_back();
+
+        //     //process parameters
+        //     tokens.pop_back();
+        //     while (tokens.back().type_ != closeParen) {
+        //         std::unique_ptr<VariableNode> param = std::make_unique<VariableNode>(tokens.back().value);
+        //         parameters.push_back(param);
+        //         tokens.pop_back();
+
+        //         if (tokens.back().type_ == comma) {
+        //             tokens.pop_back();
+        //         }
+        //     }
+        //     tokens.pop_back();
+
+        //     //process block
+        //     if (tokens.back().type_ == openCurlyBracket) {
+        //         tokens.pop_back();
+
+        //         int curlyCounter = 1;
+        //         while (tokens.size() > 0 && curlyCounter != 0) {
+        //             if (tokens.back().type_ == closeCurlyBracket)
+        //                 curlyCounter--;
+        //             else if (tokens.back().type_ == openCurlyBracket)
+        //                 curlyCounter++;
+        //             block.push_back(tokens.back());
+        //             tokens.pop_back();
+        //         }
+        //     }
+
+        //     std::shared_ptr<FunctionNode> param = std::make_unique<FunctionNode>(funcName, parameters, block);
+        //     functionList.push_back(param);
+            
+        // }
+        else if (tokens.back().type_ == returnStatement){
+
+        }
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;
 

@@ -7,13 +7,12 @@
 
 #include <algorithm>
 
-//new table
 
 struct Scrypt {
     void interpret(std::vector<Token>& tokens);
 
 private:
-    void interpretFunc(const FunctionNode& funcNode);
+    // void interpretFunc(const FunctionNode& funcNode);
     void deleteBlock(std::vector<Token>& tokens);
     std::vector<Token> getExpression(std::vector<Token>& tokens);
     std::unique_ptr<ASTNode> evalExpression(std::vector<Token>& tokens);

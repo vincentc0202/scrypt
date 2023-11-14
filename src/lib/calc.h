@@ -424,24 +424,39 @@ public:
 
 class FunctionNode : public ASTNode {
     std::string name;
-    std::vector<VariableNode> parameters;
+    std::vector<std::unique_ptr<VariableNode>> parameters;
     std::vector<Token> statementBlock;
 
     public:
-    FunctionNode(std::string n, std::vector<VariableNode> param, std::vector<Token> block) : name(n), parameters(param), statementBlock(block) {
-        type == "function";
+    FunctionNode(std::string n, std::vector<std::unique_ptr<VariableNode>> param, std::vector<Token> block) : name(n), parameters(param), statementBlock(block) {
+        type = "function";
+    }
+
+    Value evaluate() override {
+
+    }
+
+    void printInfix() override {
+
     }
     
-
-
+    
 };
 
 class ReturnNode : public ASTNode {
-    std::vector<ASTNode> returnExpression;
+    std::vector<Token> returnExpression;
 
     public:
-    ReturnNode(std::vector<ASTNode> returnExpression) {
-        
+    ReturnNode(std::vector<Token> r) : returnExpression(r) {
+        type = "return";
+    }
+
+    Value evaluate() override {
+
+    }
+
+    void printInfix() override {
+
     }
 
 };
