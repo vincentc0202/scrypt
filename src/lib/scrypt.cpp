@@ -2,13 +2,6 @@
 
 Parser parser;
 
-/*void Scrypt::interpretFunc(const functiondef & funcNode){
-    //initialize parameters and excute stamblock
-
-    interpret(funcNode);
-}*/
-
-
 void Scrypt::deleteBlock(std::vector<Token>& tokens) {
     //deletes openCurly and every expression until it reaches its corresponding end curly and deletes that
     tokens.pop_back();
@@ -185,52 +178,77 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
         }
         //funcdef
-        // else if (tokens.back().type_ == functionDefinitionStatement){
-        //     std::string funcName;
-        //     std::vector<std::unique_ptr<VariableNode>> parameters;
-        //     std::vector<Token> block;
+        else if (tokens.back().type_ == functionDefinitionStatement){
+            std::string funcName;
+            std::vector<std::unique_ptr<VariableNode>> parameters;
+            std::vector<Token> block;
+            //delete "def"
+            tokens.pop_back();
 
-        //     tokens.pop_back();
+            //process funcName;
+            funcName = tokens.back().value;
+            tokens.pop_back();
 
-        //     //process funcName;
-        //     funcName = tokens.back().value;
-        //     tokens.pop_back();
+            //process parameters
+            tokens.pop_back();
+            while (tokens.back().type_ != closeParen) {
+                std::unique_ptr<VariableNode> param = std::make_unique<VariableNode>(tokens.back().value);
+                parameters.push_back(std::move(param));
+                tokens.pop_back();
 
-        //     //process parameters
-        //     tokens.pop_back();
-        //     while (tokens.back().type_ != closeParen) {
-        //         std::unique_ptr<VariableNode> param = std::make_unique<VariableNode>(tokens.back().value);
-        //         parameters.push_back(param);
-        //         tokens.pop_back();
+                if (tokens.back().type_ == comma) {
+                    tokens.pop_back();
+                }
+            }
+            tokens.pop_back();
 
-        //         if (tokens.back().type_ == comma) {
-        //             tokens.pop_back();
-        //         }
-        //     }
-        //     tokens.pop_back();
+            //process block
+            if (tokens.back().type_ == openCurlyBracket) {
+                tokens.pop_back();
 
-        //     //process block
-        //     if (tokens.back().type_ == openCurlyBracket) {
-        //         tokens.pop_back();
+                int curlyCounter = 1;
+                while (tokens.size() > 0 && curlyCounter != 0) {
+                    if (tokens.back().type_ == closeCurlyBracket)
+                        curlyCounter--;
+                    else if (tokens.back().type_ == openCurlyBracket)
+                        curlyCounter++;
+                    block.push_back(tokens.back());
+                    tokens.pop_back();
+                }
+            }
 
-        //         int curlyCounter = 1;
-        //         while (tokens.size() > 0 && curlyCounter != 0) {
-        //             if (tokens.back().type_ == closeCurlyBracket)
-        //                 curlyCounter--;
-        //             else if (tokens.back().type_ == openCurlyBracket)
-        //                 curlyCounter++;
-        //             block.push_back(tokens.back());
-        //             tokens.pop_back();
-        //         }
-        //     }
-
-        //     std::shared_ptr<FunctionNode> param = std::make_unique<FunctionNode>(funcName, parameters, block);
-        //     functionList.push_back(param);
-            
-        // }
-        else if (tokens.back().type_ == returnStatement){
-
+            auto param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
+            functionDef[funcName] = std::move(param);          
         }
+
+        
+       
+        else if(tokens.back().type_ == identifier_ ){
+            if(tokens.size() > 1 && tokens[tokens.size() - 2].type_ == openParen){
+                
+                std::string funcName = tokens.back().value;
+                auto name = functionDef.find(funcName);
+                if (name != functionDef.end()) {
+                    auto& funcNode = name->second;
+                    // Copy the statement block of the function
+                    std::vector<Token> statementBlockCopy = funcNode->statementBlock;
+
+                    // Execute the statement block
+                    interpret(statementBlockCopy);
+
+                    
+                } else {
+                // Function not found
+                throw std::runtime_error("Function " + funcName + " not defined.");
+                }
+            }
+        }
+
+        else if (tokens.back().type_ == returnStatement){
+            std::unique_ptr<ASTNode> returnExpression;
+        }
+        //else if(token)
+
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;
 
@@ -255,3 +273,4 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
         }
     }
 }
+
