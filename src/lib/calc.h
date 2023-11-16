@@ -33,6 +33,8 @@ public:
     }
 
     Value evaluate() override {
+
+
         auto val = symbTable.find(name);
         if (val == symbTable.end()) {
             throw std::runtime_error("unknown identifier " + name);
@@ -109,6 +111,7 @@ public:
 
         auto leftName = dynamic_cast<VariableNode*>(left.get());
         Value rhs = right->evaluate();
+
         symbTable[leftName->getName()] = rhs;
         return rhs;
     }

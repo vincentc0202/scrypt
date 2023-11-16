@@ -39,7 +39,8 @@ std::unique_ptr<ASTNode> Scrypt::evalExpression(std::vector<Token>& tokens) {
 }
 
 void Scrypt::interpret(std::vector<Token>& tokens) {
-
+    
+    
     while (tokens.size() > 1) { 
         std::vector<Token> tempTokens;
         //std::vector<std::shared_ptr<FunctionNode>> functionList;
@@ -224,9 +225,12 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
         
        
         else if(tokens.back().type_ == identifier_ ){
-            if(tokens.size() > 1 && tokens[tokens.size() - 2].type_ == openParen){
+            std::string funcName = tokens.back().value;
+            tokens.pop_back();
+
+            if(!tokens.empty() && tokens.back().type_ == openParen){
+                tokens.pop_back();
                 
-                std::string funcName = tokens.back().value;
                 auto name = functionDef.find(funcName);
                 if (name != functionDef.end()) {
                     auto& funcNode = name->second;

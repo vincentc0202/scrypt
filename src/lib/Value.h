@@ -10,7 +10,6 @@
 class FunctionNode;
 
 using Value = std::variant<double, bool, std::nullptr_t, std::shared_ptr<FunctionNode>>;
-
 using Array = std::shared_ptr<std::vector<Value>>;
 using FunctionPtr = std::shared_ptr<FunctionNode>;
 
