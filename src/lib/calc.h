@@ -32,8 +32,6 @@ public:
     }
 
     Value evaluate() override {
-
-
         auto val = symbTable.find(name);
         if (val == symbTable.end()) {
             throw std::runtime_error("unknown identifier " + name);

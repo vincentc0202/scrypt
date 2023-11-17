@@ -218,7 +218,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                 }
             }
 
-            auto param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
+            Function param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
             functionDef[funcName] = std::move(param);          
         }
         else if(tokens.back().type_ == identifier_){
