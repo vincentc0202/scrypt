@@ -221,10 +221,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             auto param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
             functionDef[funcName] = std::move(param);          
         }
-
-        
-       
-        else if(tokens.back().type_ == identifier_ ){
+        else if(tokens.back().type_ == identifier_){
             std::string funcName = tokens.back().value;
             tokens.pop_back();
 

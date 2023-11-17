@@ -9,6 +9,11 @@
 #include <stdexcept>
 #include <cmath>
 
+extern std::map<std::string, Value> symbTable;
+class UnexpToken : public std::runtime_error {
+public:
+    UnexpToken(const std::string& error) : std::runtime_error(error) {}
+};
 
 class ASTNode {
 public:
@@ -18,12 +23,6 @@ public:
     virtual Value evaluate() { return 0.0; }
     virtual void printInfix() = 0;
 };
-class UnexpToken : public std::runtime_error {
-public:
-    UnexpToken(const std::string& error) : std::runtime_error(error) {}
-};
-
-extern std::map<std::string, Value> symbTable;
 
 class VariableNode : public ASTNode {
     std::string name;
