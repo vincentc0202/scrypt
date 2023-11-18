@@ -20,7 +20,8 @@ public:
     std::string type;
 
     virtual ~ASTNode() = default;
-    virtual Value evaluate() { return 0.0; }
+    // virtual Value evaluate() { return 0.0; }
+    virtual Value evaluate() = 0;
     virtual void printInfix() = 0;
 };
 
@@ -40,8 +41,17 @@ public:
         if (std::holds_alternative<double>(val->second)) {
             return std::get<double>(val->second);
         }
-        else {
+        else if (std::holds_alternative<bool>(val->second)){
             return std::get<bool>(val->second);
+        }
+        else if (std::holds_alternative<Null>(val->second)){
+            return std::get<Null>(val->second);
+        }
+        else if (std::holds_alternative<Function>(val->second)){
+            return std::get<Function>(val->second);
+        }
+        else if (std::holds_alternative<Array>(val->second)){
+            return std::get<Array>(val->second);
         }
     }
 
