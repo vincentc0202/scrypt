@@ -12,6 +12,7 @@ int main() {
 
         try {
             std::vector<Token> tokens = lexer.tokenize(input);
+            // lexer.printTokens(tokens);
             size_t pos = 0;
             parser.parencount = 0;
 

@@ -145,16 +145,16 @@ std::unique_ptr<ASTNode> Parser::parseMultDivMod(const std::vector<Token>& token
         else if(op == "/"){
             left = std::make_unique<DivideNode>(left.release(), right.release());
         }
-        else if (op == "%") {
-            left = std::make_unique<ModuloNode>(left.release(), right.release());
-        }
+        // else if (op == "%") {
+        //     left = std::make_unique<ModuloNode>(left.release(), right.release());
+        // }
     }
     return left;
 }
 
 //Deals with numbers, identifiers, and parentheses
 std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, size_t& pos){
-    auto left = parseFunctionDef(tokens, pos);
+    //auto left = parseFunctionDef(tokens, pos);
     if (pos >= tokens.size()) {
         throw std::runtime_error("Unexpected end of input");
     }
@@ -225,10 +225,10 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
     }
 }
 
-std::unique_ptr<ASTNode> Parser::parseFunctionDef(const std::vector<Token>& tokens, size_t& pos){
-    while(true){
-        throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
-    }
+// std::unique_ptr<ASTNode> Parser::parseFunctionDef(const std::vector<Token>& tokens, size_t& pos){
+//     while(true){
+//         throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
+//     }
 
 
-}
+// }

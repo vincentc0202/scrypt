@@ -221,29 +221,29 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             Function param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
             functionDef[funcName] = std::move(param);          
         }
-        else if(tokens.back().type_ == identifier_){
-            std::string funcName = tokens.back().value;
-            tokens.pop_back();
+        // else if(tokens.back().type_ == identifier_){
+        //     std::string funcName = tokens.back().value;
+        //     tokens.pop_back();
 
-            if(!tokens.empty() && tokens.back().type_ == openParen){
-                tokens.pop_back();
+        //     if(!tokens.empty() && tokens.back().type_ == openParen){
+        //         tokens.pop_back();
                 
-                auto name = functionDef.find(funcName);
-                if (name != functionDef.end()) {
-                    auto& funcNode = name->second;
-                    // Copy the statement block of the function
-                    std::vector<Token> statementBlockCopy = funcNode->statementBlock;
+        //         auto name = functionDef.find(funcName);
+        //         if (name != functionDef.end()) {
+        //             auto& funcNode = name->second;
+        //             // Copy the statement block of the function
+        //             std::vector<Token> statementBlockCopy = funcNode->statementBlock;
 
-                    // Execute the statement block
-                    interpret(statementBlockCopy);
+        //             // Execute the statement block
+        //             interpret(statementBlockCopy);
 
                     
-                } else {
-                // Function not found
-                throw std::runtime_error("Function " + funcName + " not defined.");
-                }
-            }
-        }
+        //         } else {
+        //         // Function not found
+        //         throw std::runtime_error("Function " + funcName + " not defined.");
+        //         }
+        //     }
+        // }
 
         else if (tokens.back().type_ == returnStatement){
             std::unique_ptr<ASTNode> returnExpression;

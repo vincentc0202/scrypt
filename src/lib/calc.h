@@ -20,7 +20,6 @@ public:
     std::string type;
 
     virtual ~ASTNode() = default;
-    // virtual Value evaluate() { return 0.0; }
     virtual Value evaluate() = 0;
     virtual void printInfix() = 0;
 };
@@ -38,21 +37,23 @@ public:
             throw std::runtime_error("unknown identifier " + name);
         }
 
-        if (std::holds_alternative<double>(val->second)) {
-            return std::get<double>(val->second);
+        Value second = val->second;
+
+        if (std::holds_alternative<double>(second)) {
+            return std::get<double>(second);
         }
-        else if (std::holds_alternative<bool>(val->second)){
-            return std::get<bool>(val->second);
+        else if (std::holds_alternative<bool>(second)){
+            return std::get<bool>(second);
         }
-        else if (std::holds_alternative<Null>(val->second)){
-            return std::get<Null>(val->second);
+        else /*if (std::holds_alternative<Function>(second))*/ {
+            return std::get<Function>(second);
         }
-        else if (std::holds_alternative<Function>(val->second)){
-            return std::get<Function>(val->second);
-        }
-        else if (std::holds_alternative<Array>(val->second)){
-            return std::get<Array>(val->second);
-        }
+        // else if (std::holds_alternative<Array>(second)){
+        //     return std::get<Array>(second);
+        // }
+        // else if (std::holds_alternative<Null>(second)){
+        //     return std::get<Null>(second);
+        // }
     }
 
     void printInfix() override {
@@ -66,40 +67,40 @@ public:
 
 
 class NumberNode : public ASTNode {
-    double value;
+    Value value;
 
 public:
-    NumberNode(double val) : value(val) {
+    NumberNode(Value val) : value(val) {
         type = "number";
     }
     void printInfix() override {
-        std::cout << value;
+        std::cout << std::get<double>(value);
     }
     
     Value evaluate() override {
-        return value;
+        return std::get<double>(value);
     }
 };
 
 class BooleanNode : public ASTNode {
-    bool value;
+    Value value;
 
     public: 
-        BooleanNode(bool val) : value(val) {
+        BooleanNode(Value val) : value(val) {
             type = "boolean";
         }
 
         Value evaluate() override {
-            if (value) {
-                return true;
+            if (std::get<bool>(value)) {
+                return std::get<bool>(value);
             }
             else {
-                return false;
+                return std::get<bool>(value);
             }
         }
 
         void printInfix() override {
-            std::cout << (value ? "true" : "false");
+            std::cout << (std::get<bool>(value) ? "true" : "false");
         }
 };
 
@@ -256,14 +257,19 @@ public:
     Value evaluate() override {
         Value lhs = left->evaluate();
         Value rhs = right->evaluate();
+        double leftEval = std::get<double>(lhs);
         double rightEval = std::get<double>(rhs);
         
         if (rightEval == 0) {
             throw std::runtime_error("division by zero.");
         }
         if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
-            return std::fmod(std::get<double>(lhs), rightEval);
-        }
+            double result = std::fmod(leftEval, rightEval);
+            std::cout << result << '\n';
+            Value val;
+            val.emplace<double>(result);
+            return val;
+        }   
         else {
             throw std::runtime_error("invalid operand type.");
         }
