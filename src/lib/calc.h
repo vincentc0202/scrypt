@@ -265,7 +265,6 @@ public:
         }
         if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
             double result = std::fmod(leftEval, rightEval);
-            std::cout << result << '\n';
             Value val;
             val.emplace<double>(result);
             return val;

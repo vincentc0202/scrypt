@@ -145,9 +145,9 @@ std::unique_ptr<ASTNode> Parser::parseMultDivMod(const std::vector<Token>& token
         else if(op == "/"){
             left = std::make_unique<DivideNode>(left.release(), right.release());
         }
-        // else if (op == "%") {
-        //     left = std::make_unique<ModuloNode>(left.release(), right.release());
-        // }
+        else if (op == "%") {
+            left = std::make_unique<ModuloNode>(left.release(), right.release());
+        }
     }
     return left;
 }
