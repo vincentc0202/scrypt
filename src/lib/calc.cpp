@@ -173,6 +173,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         return std::make_unique<NumberNode>(value);
     } 
     else if (tokens[pos].type_ == identifier_) {
+        //implement function call here (check for where open parenthesis is)
         std::string varName = tokens[pos].value;
         pos++;
 
@@ -229,6 +230,4 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
 //     while(true){
 //         throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
 //     }
-
-
 // }

@@ -38,7 +38,7 @@ public:
         }
 
         Value second = val->second;
-
+        
         if (std::holds_alternative<double>(second)) {
             return std::get<double>(second);
         }
@@ -518,7 +518,7 @@ public:
     std::unique_ptr<ASTNode> parseAddSub(const std::vector<Token>& tokens, size_t& pos);
     std::unique_ptr<ASTNode> parseMultDivMod(const std::vector<Token>& tokens, size_t& pos);
     std::unique_ptr<ASTNode> parseFactor(const std::vector<Token>& tokens, size_t& pos);
-    std::unique_ptr<ASTNode> parseFunctionDef(const std::vector<Token>& tokens, size_t& pos);
+    // std::unique_ptr<ASTNode> parseFunctionDef(const std::vector<Token>& tokens, size_t& pos);
 };
 
 #endif // CALC_H

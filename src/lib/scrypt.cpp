@@ -219,12 +219,16 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             }
 
             Function param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
-            functionDef[funcName] = std::move(param);          
+            //do we need functionlist map?
+            functionDef[funcName] = std::move(param);     
+            symbTable[funcName] = param;     
         }
         // else if(tokens.back().type_ == identifier_){
         //     std::string funcName = tokens.back().value;
         //     tokens.pop_back();
 
+        // a = (2 + 3);
+        // b = foo(2, 3);
         //     if(!tokens.empty() && tokens.back().type_ == openParen){
         //         tokens.pop_back();
                 
