@@ -10,7 +10,7 @@
 
 
 struct Scrypt {
-    std::map<std::string, Function> functionDef;
+    // std::map<std::string, Function> functionDef;
 
     void interpret(std::vector<Token>& tokens);
     

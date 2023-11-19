@@ -1,6 +1,7 @@
 #include "calc.h"
 
 std::map<std::string, Value> symbTable;
+// std::map<std::string, Function> functionDef;
 
 std::unique_ptr<ASTNode> Parser::parseExpression(const std::vector<Token>& tokens, size_t& pos) {
     
@@ -177,14 +178,14 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         std::string varName = tokens[pos].value;
         pos++;
 
-        //parencount checker
+        //has to be function call here
         if(pos < tokens.size() && tokens[pos].type_ == openParen){
             parencount++;
-        } 
-        else if (pos < tokens.size() && tokens[pos].type_ == closeParen){
-            parencount--;
-        }
 
+            //assign local variables
+        } 
+
+    
         return std::make_unique<VariableNode>(varName);
     } 
     else if (tokens[pos].type_ == boolTrue || tokens[pos].type_ == boolFalse) {

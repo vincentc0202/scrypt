@@ -220,7 +220,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
 
             Function param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
             //do we need functionlist map?
-            functionDef[funcName] = std::move(param);     
+            // functionDef[funcName] = std::move(param);     
             symbTable[funcName] = param;     
         }
         // else if(tokens.back().type_ == identifier_){

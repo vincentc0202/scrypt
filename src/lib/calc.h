@@ -10,6 +10,7 @@
 #include <cmath>
 
 extern std::map<std::string, Value> symbTable;
+// extern std::map<std::string, Function> functionDef;
 class UnexpToken : public std::runtime_error {
 public:
     UnexpToken(const std::string& error) : std::runtime_error(error) {}
