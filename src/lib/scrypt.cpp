@@ -172,7 +172,8 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             if (std::holds_alternative<double>(result)) {
                 std::cout << std::get<double>(result) << '\n';
             }
-            else {
+            //NOV 20: AN ERROR IS BEING THROWN AROUND HERE (bad variant access) BC WE ARE NOT ACCOUNTING FOR FUNCTIONS WHEN PRINTING
+            else if (std::holds_alternative<bool>(result)) {
                 std::cout << (std::get<bool>(result) ? "true" : "false") << '\n';
             }
 
@@ -185,9 +186,14 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             //delete "def"
             tokens.pop_back();
 
-            //process funcName;
-            funcName = tokens.back().value;
-            tokens.pop_back();
+            //process funcName; (only processes if the function identifier starts with a letter)
+            if (isalpha(tokens.back().value[0])) {
+                funcName = tokens.back().value;
+                tokens.pop_back();
+            }
+            else {
+                throw std::runtime_error("not a function.");
+            }
 
             //process parameters
             tokens.pop_back();
@@ -220,6 +226,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             Function function = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
             symbTable[funcName] = function;     
         }
+        //NOT FINISHED YET 
         else if (tokens.back().type_ == returnStatement){
             std::unique_ptr<ASTNode> returnExpression;
         }
