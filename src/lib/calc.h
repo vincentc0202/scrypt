@@ -488,8 +488,6 @@ class FunctionNode : public ASTNode {
 };
 
 class ReturnNode : public ASTNode {
-   
-
     public:
     ReturnNode(std::unique_ptr<ASTNode> returnExpression) {
         

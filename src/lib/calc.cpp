@@ -174,18 +174,58 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         return std::make_unique<NumberNode>(value);
     } 
     else if (tokens[pos].type_ == identifier_) {
-        //implement function call here (check for where open parenthesis is)
         std::string varName = tokens[pos].value;
         pos++;
 
         //has to be function call here
         if(pos < tokens.size() && tokens[pos].type_ == openParen){
-            parencount++;
+            // auto name = symbTable.find(varName);
+            // if (name != symbTable.end()) {
+            //     Function function = std::get<Function>(name->second);
+            //     std::vector<Token> statementBlockCopy = function->statementBlock;
+            // } 
+            // else {
+            //     throw std::runtime_error("not a function.");
+            // }
 
-            //assign local variables
-        } 
+            //process function call parameters
+            std::vector<Value> valueParameters;
+            //skip (
+            pos++;
+            while (pos < tokens.size() && tokens[pos].type_ != closeParen) {
+                Value val;
+                //converting into type Value
+                if (tokens[pos].type_ == boolTrue) {
+                    bool boolean = true;
+                    val.emplace<bool>(boolean);
+                }
+                else if (tokens[pos].type_ == boolFalse) {
+                    bool boolean = false;
+                    val.emplace<bool>(boolean);
+                }
+                else if (tokens[pos].type_ == number) {
+                    double doub = std::stod(tokens[pos].value);
+                    val.emplace<double>(doub);
+                }
+                valueParameters.push_back(val);
+                pos++;
 
-    
+                if (tokens[pos].type_ == comma) {
+                    pos++;
+                }
+            }
+            //skip )
+            pos++;
+
+            for (auto params : valueParameters) {
+                std::cout << std::get<double>(params) <<'\n';
+            }
+        }
+
+        if (pos < tokens.size() && tokens[pos].type_ == closeParen){
+            parencount--;
+        }
+
         return std::make_unique<VariableNode>(varName);
     } 
     else if (tokens[pos].type_ == boolTrue || tokens[pos].type_ == boolFalse) {
@@ -226,9 +266,3 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
     }
 }
-
-// std::unique_ptr<ASTNode> Parser::parseFunctionDef(const std::vector<Token>& tokens, size_t& pos){
-//     while(true){
-//         throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
-//     }
-// }

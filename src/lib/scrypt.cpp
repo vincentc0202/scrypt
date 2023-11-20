@@ -178,7 +178,6 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
 
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
         }
-        //funcdef
         else if (tokens.back().type_ == functionDefinitionStatement){
             std::string funcName;
             std::vector<std::unique_ptr<VariableNode>> parameters;
@@ -218,10 +217,8 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                 }
             }
 
-            Function param = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
-            //do we need functionlist map?
-            // functionDef[funcName] = std::move(param);     
-            symbTable[funcName] = param;     
+            Function function = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
+            symbTable[funcName] = function;     
         }
         // else if(tokens.back().type_ == identifier_){
         //     std::string funcName = tokens.back().value;
