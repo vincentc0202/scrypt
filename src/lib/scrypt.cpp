@@ -220,37 +220,9 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             Function function = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
             symbTable[funcName] = function;     
         }
-        // else if(tokens.back().type_ == identifier_){
-        //     std::string funcName = tokens.back().value;
-        //     tokens.pop_back();
-
-        // a = (2 + 3);
-        // b = foo(2, 3);
-        //     if(!tokens.empty() && tokens.back().type_ == openParen){
-        //         tokens.pop_back();
-                
-        //         auto name = functionDef.find(funcName);
-        //         if (name != functionDef.end()) {
-        //             auto& funcNode = name->second;
-        //             // Copy the statement block of the function
-        //             std::vector<Token> statementBlockCopy = funcNode->statementBlock;
-
-        //             // Execute the statement block
-        //             interpret(statementBlockCopy);
-
-                    
-        //         } else {
-        //         // Function not found
-        //         throw std::runtime_error("Function " + funcName + " not defined.");
-        //         }
-        //     }
-        // }
-
         else if (tokens.back().type_ == returnStatement){
             std::unique_ptr<ASTNode> returnExpression;
         }
-        //else if(token)
-
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;
 
