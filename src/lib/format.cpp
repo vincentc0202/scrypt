@@ -85,6 +85,20 @@ void Format::printFormat(std::vector<Token>& tokens) {
             root->printInfix();
             std::cout << ";\n";
         }
+        else if (tokens.back().type_ == functionDefinitionStatement) {
+            printIndents(curlyCounter);
+            std::cout << "def "; 
+            tokens.pop_back();
+
+            while (tokens.size() > 0 && (tokens.back().type_ != openCurlyBracket))   {
+                tempTokens.push_back(tokens.back());
+                tokens.pop_back();
+            }
+
+            //not implemented yet
+            std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
+            root->printInfix();
+        }
         else if (tokens.back().type_ == openCurlyBracket) {
             std::cout << " {\n";
             curlyCounter++;
