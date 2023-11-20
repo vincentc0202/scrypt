@@ -180,11 +180,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         //has to be function call here
         if(pos < tokens.size() && tokens[pos].type_ == openParen){
             auto name = symbTable.find(varName);
-            if (name != symbTable.end()) {
-                Function function = std::get<Function>(name->second);
-                std::vector<Token> statementBlockCopy = function->statementBlock;
-            } 
-            else {
+            if (name == symbTable.end()) {
                 throw std::runtime_error("not a function.");
             }
 
@@ -216,6 +212,10 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
             }
             //skip )
             pos++;
+
+            Function functionCopy = std::get<Function>(name->second);
+            //Value functionValue = functionCopy->evaluate();
+            return std::make_unique<FunctionNode>(functionCopy->name, functionCopy->parameters, functionCopy->statementBlock);
         }
 
         if (pos < tokens.size() - 1 && tokens[pos].type_ == closeParen){

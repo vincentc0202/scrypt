@@ -18,7 +18,7 @@ int main () {
         std::vector<Token> tokens = lexer.tokenize(result);
         //lexer.printTokens(tokens);
         std::reverse(tokens.begin(), tokens.end());
-        scrypt.interpret(tokens);
+        scrypt.interpret(tokens);                                           
     }
     //lexer error
     catch(const std::logic_error& e){

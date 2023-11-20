@@ -220,7 +220,9 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                         curlyCounter++;
                     block.push_back(tokens.back());
                     tokens.pop_back();
-                }
+                }   
+                //get rid of last }
+                block.pop_back();
             }
 
             Function function = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
