@@ -15,7 +15,7 @@ class Function {
     std::vector<Token> parameters;
     std::vector<Token> block;
 
-    Function(std::unique_ptr<FunctionDefNode> n, std::vector<Token> p, std::vector<Token> b) : node(std::move(n)), parameters(p), block(b) {
+    Function(std::unique_ptr<FunctionDefNode> n, std::vector<Token> p, std::vector<Token> b) : node(std::move(n)), parameters(std::move(p)), block(std::move(b)) {
     }
 
     // Value getValue(std::vector<Value> arguments, std::map<std::string, Value> variables) {

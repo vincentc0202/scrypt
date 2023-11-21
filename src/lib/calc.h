@@ -497,7 +497,16 @@ class FunctionCallNode : public ASTNode {
     }
     
     Value evaluate() override{
-        throw std::runtime_error("not yet implment");
+        FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
+        
+        if (arguments.size() != function->parameters.size()) {
+            throw std::runtime_error("incorrect argument count.");
+        }
+        for (size_t i = 0; i < arguments.size(); i++) {
+            symbTable[function->parameters[i].value] = arguments[i];
+        }
+
+        
     }
     void printInfix() override{
 
