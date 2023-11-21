@@ -11,7 +11,7 @@ void printIndents(int counter) {
 }
 
 void Format::printFormat(std::vector<Token>& tokens) {
-    //NOTE: the tokens are already reversed because it makes popping from back is much more efficient than popping from front
+    //NOTE: the tokens are already reversed because popping from back is much more efficient than popping from front
     Parser parser;
     int curlyCounter = 0;
     bool elifCurly = false;
@@ -94,8 +94,7 @@ void Format::printFormat(std::vector<Token>& tokens) {
                 tempTokens.push_back(tokens.back());
                 tokens.pop_back();
             }
-
-            //not implemented yet
+            //should work?
             std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
             root->printInfix();
         }

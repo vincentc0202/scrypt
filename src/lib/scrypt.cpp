@@ -183,7 +183,6 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
         }
         else if (tokens.back().type_ == functionDefinitionStatement){
             std::string funcName;
-            // std::vector<std::unique_ptr<VariableNode>> parameters;
             std::vector<Token> parameters;
             std::vector<Token> block;
             //delete "def"
@@ -201,7 +200,6 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             //process parameters
             tokens.pop_back();
             while (tokens.back().type_ != closeParen) {
-                // std::unique_ptr<VariableNode> param = std::make_unique<VariableNode>(tokens.back().value);
                 parameters.push_back(tokens.back());
                 tokens.pop_back();
 
