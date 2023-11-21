@@ -181,13 +181,14 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
         }
         else if (tokens.back().type_ == functionDefinitionStatement){
             std::string funcName;
-            std::vector<std::unique_ptr<VariableNode>> parameters;
+            // std::vector<std::unique_ptr<VariableNode>> parameters;
+            std::vector<Token> parameters;
             std::vector<Token> block;
             //delete "def"
             tokens.pop_back();
 
             //process funcName; (only processes if the function identifier starts with a letter)
-            if (isalpha(tokens.back().value[0])) {
+            if (tokens.back().type_ == identifier_) {
                 funcName = tokens.back().value;
                 tokens.pop_back();
             }
@@ -198,8 +199,8 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             //process parameters
             tokens.pop_back();
             while (tokens.back().type_ != closeParen) {
-                std::unique_ptr<VariableNode> param = std::make_unique<VariableNode>(tokens.back().value);
-                parameters.push_back(std::move(param));
+                // std::unique_ptr<VariableNode> param = std::make_unique<VariableNode>(tokens.back().value);
+                parameters.push_back(tokens.back());
                 tokens.pop_back();
 
                 if (tokens.back().type_ == comma) {
@@ -225,11 +226,13 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                 block.pop_back();
             }
 
-            Function function = std::make_shared<FunctionNode>(funcName, std::move(parameters), block);
-            symbTable[funcName] = function;     
+            std::unique_ptr<FunctionDefNode> functionDef = std::make_unique<FunctionDefNode>(funcName, parameters, block);
+            FunctionPtr function = std::make_shared<Function>(functionDef, parameters, block);
+            symbTable[funcName] = function;
         }
         //NOT FINISHED YET 
         else if (tokens.back().type_ == returnStatement){
+            //make sure to check if it's within a function
             std::unique_ptr<ASTNode> returnExpression;
         }
         else {  // if the statement is just an expression

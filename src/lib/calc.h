@@ -4,6 +4,7 @@
 #include "Token.h" 
 #include "lex.h"
 #include "Value.h"
+// #include "Function.h"
 
 #include <map>
 #include <stdexcept>
@@ -46,8 +47,8 @@ public:
         else if (std::holds_alternative<bool>(second)){
             return std::get<bool>(second);
         }
-        else /*if (std::holds_alternative<Function>(second))*/ {
-            return std::get<Function>(second);
+        else /*if (std::holds_alternative<FunctionPtr>(second))*/ {
+            return std::get<FunctionPtr>(second);
         }
         // else if (std::holds_alternative<Array>(second)){
         //     return std::get<Array>(second);
@@ -468,15 +469,31 @@ public:
     }
 };
 
-
-class FunctionNode : public ASTNode {
+class FunctionDefNode : public ASTNode {
     public:
     std::string name;
-    std::vector<std::unique_ptr<VariableNode>> parameters;
+    std::vector<Token> parameters;
     std::vector<Token> statementBlock;
 
-    FunctionNode(std::string n, std::vector<std::unique_ptr<VariableNode>>&& param, std::vector<Token> block) : name(std::move(n)), parameters(std::move(param)), statementBlock(std::move(block)) {
-        type = "function";
+    FunctionDefNode(std::string n, std::vector<Token> param, std::vector<Token> block) : name(n), parameters(param), statementBlock(block) {
+        type = "functionDef";
+    }
+    
+    Value evaluate() override{
+        return symbTable[name];
+    }
+    void printInfix() override{
+
+    }
+};
+
+class FunctionCallNode : public ASTNode {
+    public:
+    std::string name;
+    std::vector<Value> arguments;
+
+    FunctionCallNode(std::string n, std::vector<Value> args) : name(n), arguments(args) {
+        type = "functionCall";
     }
     
     Value evaluate() override{
@@ -517,7 +534,7 @@ public:
     std::unique_ptr<ASTNode> parseAddSub(const std::vector<Token>& tokens, size_t& pos);
     std::unique_ptr<ASTNode> parseMultDivMod(const std::vector<Token>& tokens, size_t& pos);
     std::unique_ptr<ASTNode> parseFactor(const std::vector<Token>& tokens, size_t& pos);
-    // std::unique_ptr<ASTNode> parseFunctionDef(const std::vector<Token>& tokens, size_t& pos);
+    std::shared_ptr<ASTNode> parseFunction(const std::vector<Token>& tokens, size_t& pos);
 };
 
 #endif // CALC_H

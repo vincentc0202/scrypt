@@ -7,6 +7,7 @@
 #include <map>
 #include <algorithm>
 #include "Value.h"
+#include "Function.h"
 
 
 struct Scrypt {

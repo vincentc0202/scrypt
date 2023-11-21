@@ -184,13 +184,13 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
                 throw std::runtime_error("not a function.");
             }
 
-            //process function call parameters
-            std::vector<Value> valueParameters;
+            //process arguments
+            std::vector<Value> arguments;
             //skip (
             pos++;
             while (pos < tokens.size() && tokens[pos].type_ != closeParen) {
                 Value val;
-                //converting into type Value
+                //converting argument into type Value
                 if (tokens[pos].type_ == boolTrue) {
                     bool boolean = true;
                     val.emplace<bool>(boolean);
@@ -203,7 +203,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
                     double doub = std::stod(tokens[pos].value);
                     val.emplace<double>(doub);
                 }
-                valueParameters.push_back(val);
+                arguments.push_back(val);
                 pos++;
 
                 if (tokens[pos].type_ == comma) {
@@ -213,9 +213,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
             //skip )
             pos++;
 
-            Function functionCopy = std::get<Function>(name->second);
-            //Value functionValue = functionCopy->evaluate();
-            return std::make_unique<FunctionNode>(functionCopy->name, functionCopy->parameters, functionCopy->statementBlock);
+            return std::make_unique<FunctionCallNode>(varName, arguments);
         }
 
         if (pos < tokens.size() - 1 && tokens[pos].type_ == closeParen){
@@ -262,3 +260,4 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
     }
 }
+
