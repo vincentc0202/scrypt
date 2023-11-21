@@ -1,7 +1,7 @@
 #include "calc.h"
 
 std::map<std::string, Value> symbTable;
-// std::map<std::string, Function> functionDef;
+Parser parser;
 
 std::unique_ptr<ASTNode> Parser::parseExpression(const std::vector<Token>& tokens, size_t& pos) {
     
@@ -185,30 +185,21 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
             }
 
             //process arguments
-            std::vector<Value> arguments;
+            std::vector<std::unique_ptr<ASTNode>> arguments;
             //skip (
             pos++;
             while (pos < tokens.size() && tokens[pos].type_ != closeParen) {
-                Value val;
-                //converting argument into type Value
-                if (tokens[pos].type_ == boolTrue) {
-                    bool boolean = true;
-                    val.emplace<bool>(boolean);
-                }
-                else if (tokens[pos].type_ == boolFalse) {
-                    bool boolean = false;
-                    val.emplace<bool>(boolean);
-                }
-                else if (tokens[pos].type_ == number) {
-                    double doub = std::stod(tokens[pos].value);
-                    val.emplace<double>(doub);
-                }
-                arguments.push_back(val);
-                pos++;
-
-                if (tokens[pos].type_ == comma) {
+                std::vector<Token> tempArgument;
+                while (pos < tokens.size() && tokens[pos].type_ != comma) {
+                    tempArgument.push_back(tokens[pos]);
                     pos++;
                 }
+                size_t tempPos = 0;
+                auto argumentPointer = parser.parseExpression(tempArgument, tempPos);
+                arguments.push_back(argumentPointer);  
+
+                //skip comma
+                pos++;
             }
             //skip )
             pos++;

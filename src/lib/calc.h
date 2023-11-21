@@ -494,15 +494,22 @@ class FunctionDefNode : public ASTNode {
 class FunctionCallNode : public ASTNode {
     public:
     std::string name;
-    std::vector<Value> arguments;
+    std::vector<std::unique_ptr<ASTNode>> arguments;
     Scrypt scrypt;
 
-    FunctionCallNode(std::string n, std::vector<Value> args) : name(n), arguments(args) {
+    FunctionCallNode(std::string n, std::vector<std::unique_ptr<ASTNode>> args) : name(n), arguments(std::move(args)) {
         type = "functionCall";
     }
     
     Value evaluate() override {
         std::map<std::string, Value> globalScope = symbTable;
+        std::vector<Value> args;
+
+        //evaluate arguments first
+        for (size_t i = 0; i < arguments.size(); i++) {
+            Value arg = arguments[i]->evaluate();
+            args.push_back(arg);
+        }
 
         FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
         if (arguments.size() != function->parameters.size()) {
@@ -511,7 +518,7 @@ class FunctionCallNode : public ASTNode {
 
         symbTable.clear();
         for (size_t i = 0; i < arguments.size(); i++) {
-            symbTable[function->parameters[i].value] = arguments[i];
+            symbTable[function->parameters[i].value] = args[i];
         }
 
         scrypt.interpret(function->block);
@@ -520,22 +527,13 @@ class FunctionCallNode : public ASTNode {
         return function;
     }
     void printInfix() override{
-        Value lastValue = arguments[arguments.size() - 1];
-
         std::cout << name << "(";
         for (size_t i = 0; i < arguments.size() - 1; i++) {
-            if (std::holds_alternative<double>(arguments[i]))
-                std::cout << std::get<double>(arguments[i]) << ", ";
-            else if (std::holds_alternative<bool>(arguments[i]))
-                std::cout << std::get<bool>(arguments[i]) << ", ";
+            arguments[i]->printInfix();
+            std::cout << ", ";
         }
-        if (std::holds_alternative<double>(lastValue))
-            std::cout << std::get<double>(lastValue) << ")";
-        else if (std::holds_alternative<bool>(lastValue))
-            std::cout << std::get<bool>(lastValue) << ")";
-
-        // std::visit([](const auto &lastValue) { std::cout << lastValue; }, Value);
-        // std::cout << "\n";
+        arguments[arguments.size() - 1]->printInfix();
+        std::cout << ")";
     }
 };
 
