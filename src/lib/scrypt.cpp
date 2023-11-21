@@ -1,5 +1,7 @@
 #include "scrypt.h"
 
+#include "calc.h"
+
 Parser parser;
 
 void Scrypt::deleteBlock(std::vector<Token>& tokens) {

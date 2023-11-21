@@ -1,17 +1,17 @@
 #ifndef CALC_H
 #define CALC_H
 
-#include "Token.h" 
 #include "lex.h"
 #include "Value.h"
-// #include "Function.h"
+#include "Function.h"
+#include "scrypt.h"
 
 #include <map>
 #include <stdexcept>
 #include <cmath>
 
 extern std::map<std::string, Value> symbTable;
-// extern std::map<std::string, Function> functionDef;
+
 class UnexpToken : public std::runtime_error {
 public:
     UnexpToken(const std::string& error) : std::runtime_error(error) {}
@@ -496,17 +496,26 @@ class FunctionCallNode : public ASTNode {
         type = "functionCall";
     }
     
-    Value evaluate() override{
+    Value evaluate() override {
+        Scrypt scrypt;
+        std::map<std::string, Value> globalScope = symbTable;
+
         FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
-        
         if (arguments.size() != function->parameters.size()) {
             throw std::runtime_error("incorrect argument count.");
         }
+
+        symbTable.clear();
         for (size_t i = 0; i < arguments.size(); i++) {
             symbTable[function->parameters[i].value] = arguments[i];
         }
 
-        
+        scrypt.interpret(function->block);
+
+
+
+
+        symbTable = globalScope;
     }
     void printInfix() override{
 
@@ -543,7 +552,6 @@ public:
     std::unique_ptr<ASTNode> parseAddSub(const std::vector<Token>& tokens, size_t& pos);
     std::unique_ptr<ASTNode> parseMultDivMod(const std::vector<Token>& tokens, size_t& pos);
     std::unique_ptr<ASTNode> parseFactor(const std::vector<Token>& tokens, size_t& pos);
-    std::shared_ptr<ASTNode> parseFunction(const std::vector<Token>& tokens, size_t& pos);
 };
 
 #endif // CALC_H
