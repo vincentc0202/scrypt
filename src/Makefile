@@ -16,10 +16,10 @@ scrypts: lex calc format scrypt
 lex: lex.o lexer.o
 	${CXX} $(CXXFLAGS) -o $@ $+
 
-calc: calc.o calculator.o lexer.o
+calc: calc.o calculator.o lexer.o scrypter.o
 	${CXX} $(CXXFLAGS) -o $@ $+
   
-format: format.o formatter.o lexer.o calculator.o
+format: format.o formatter.o lexer.o calculator.o  scrypter.o
 	${CXX} $(CXXFLAGS) -o $@ $+
 
 scrypt: scrypt.o scrypter.o lexer.o calculator.o 
@@ -54,5 +54,4 @@ scrypter.o: lib/scrypt.cpp
 
 clean:
 	rm *.o lex calc format scrypt
-
 

@@ -2,7 +2,6 @@
 #define SCRYPT_H
 
 #include "lex.h"
-#include "calc.h"
 #include "Value.h"
 #include "Function.h"
 
@@ -12,8 +11,6 @@
 class ASTNode;
 
 struct Scrypt {
-    // std::map<std::string, Function> functionDef;
-
     void interpret(std::vector<Token>& tokens);
     
 private:

@@ -483,7 +483,11 @@ class FunctionDefNode : public ASTNode {
         return symbTable[name];
     }
     void printInfix() override{
-
+        std::cout << name << "(";
+        for (size_t i = 0; i < parameters.size() - 1; i++) {
+            std::cout << parameters[i].value << ", ";
+        }
+        std::cout << parameters[parameters.size() - 1].value << ")";
     }
 };
 
@@ -491,13 +495,13 @@ class FunctionCallNode : public ASTNode {
     public:
     std::string name;
     std::vector<Value> arguments;
+    Scrypt scrypt;
 
     FunctionCallNode(std::string n, std::vector<Value> args) : name(n), arguments(args) {
         type = "functionCall";
     }
     
     Value evaluate() override {
-        Scrypt scrypt;
         std::map<std::string, Value> globalScope = symbTable;
 
         FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
@@ -512,13 +516,26 @@ class FunctionCallNode : public ASTNode {
 
         scrypt.interpret(function->block);
 
-
-
-
         symbTable = globalScope;
+        return function;
     }
     void printInfix() override{
+        Value lastValue = arguments[arguments.size() - 1];
 
+        std::cout << name << "(";
+        for (size_t i = 0; i < arguments.size() - 1; i++) {
+            if (std::holds_alternative<double>(arguments[i]))
+                std::cout << std::get<double>(arguments[i]) << ", ";
+            else if (std::holds_alternative<bool>(arguments[i]))
+                std::cout << std::get<bool>(arguments[i]) << ", ";
+        }
+        if (std::holds_alternative<double>(lastValue))
+            std::cout << std::get<double>(lastValue) << ")";
+        else if (std::holds_alternative<bool>(lastValue))
+            std::cout << std::get<bool>(lastValue) << ")";
+
+        // std::visit([](const auto &lastValue) { std::cout << lastValue; }, Value);
+        // std::cout << "\n";
     }
 };
 

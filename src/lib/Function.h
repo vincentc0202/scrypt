@@ -1,7 +1,6 @@
 #ifndef FUNCTION_H
 #define FUNCTION_H
 
-#include "calc.h"
 #include "Token.h"
 
 #include <memory>
