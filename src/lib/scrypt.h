@@ -2,6 +2,7 @@
 #define SCRYPT_H
 
 #include "lex.h"
+#include "calc.h"
 #include "Value.h"
 #include "Function.h"
 

@@ -1,7 +1,6 @@
 #include "calc.h"
 
 std::map<std::string, Value> symbTable;
-Parser parser;
 
 std::unique_ptr<ASTNode> Parser::parseExpression(const std::vector<Token>& tokens, size_t& pos) {
     
@@ -195,8 +194,8 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
                     pos++;
                 }
                 size_t tempPos = 0;
-                auto argumentPointer = parser.parseExpression(tempArgument, tempPos);
-                arguments.push_back(argumentPointer);  
+                auto argumentPointer = parseExpression(tempArgument, tempPos);
+                arguments.push_back(std::move(argumentPointer));  
 
                 //skip comma
                 pos++;
@@ -204,7 +203,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
             //skip )
             pos++;
 
-            return std::make_unique<FunctionCallNode>(varName, arguments);
+            return std::make_unique<FunctionCallNode>(varName, std::move(arguments));
         }
 
         if (pos < tokens.size() - 1 && tokens[pos].type_ == closeParen){

@@ -520,7 +520,7 @@ class FunctionCallNode : public ASTNode {
         for (size_t i = 0; i < arguments.size(); i++) {
             symbTable[function->parameters[i].value] = args[i];
         }
-
+        //still unsure about this
         scrypt.interpret(function->block);
 
         symbTable = globalScope;
