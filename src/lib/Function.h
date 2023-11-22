@@ -12,11 +12,11 @@ class FunctionDefNode;
 
 class Function {
     public:
-    std::unique_ptr<FunctionDefNode> node;
+    FunctionDefNode* node;
     std::vector<Token> parameters;
     std::vector<Token> block;
 
-    Function(std::unique_ptr<FunctionDefNode> n, std::vector<Token> p, std::vector<Token> b) : node(std::move(n)), parameters(p), block(b) {
+    Function(FunctionDefNode* n, std::vector<Token> p, std::vector<Token> b) : node(n), parameters(p), block(b) {
     }
 };
 

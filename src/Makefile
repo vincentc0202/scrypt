@@ -16,13 +16,13 @@ scrypts: lex calc format scrypt
 lex: lex.o lexer.o
 	${CXX} $(CXXFLAGS) -o $@ $+
 
-calc: calc.o calculator.o lexer.o scrypter.o
+calc: calc.o calculator.o lexer.o scrypter.o formatter.o
 	${CXX} $(CXXFLAGS) -o $@ $+
   
 format: format.o formatter.o lexer.o calculator.o  scrypter.o
 	${CXX} $(CXXFLAGS) -o $@ $+
 
-scrypt: scrypt.o scrypter.o lexer.o calculator.o 
+scrypt: scrypt.o scrypter.o lexer.o calculator.o formatter.o 
 	${CXX} $(CXXFLAGS) -o $@ $+
 
 

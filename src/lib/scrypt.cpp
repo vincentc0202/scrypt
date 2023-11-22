@@ -227,8 +227,9 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             }
 
             std::unique_ptr<FunctionDefNode> functionDef = std::make_unique<FunctionDefNode>(funcName, parameters, block);
-            FunctionPtr function = std::make_shared<Function>(std::move(functionDef), std::move(parameters), std::move(block));
+            FunctionPtr function = std::make_shared<Function>(functionDef.get(), parameters, block);
             symbTable[funcName] = function;
+
         }
         //NOT FINISHED YET 
         else if (tokens.back().type_ == returnStatement){

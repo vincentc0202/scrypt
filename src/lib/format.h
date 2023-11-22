@@ -3,13 +3,13 @@
 
 #include "Token.h" 
 #include "lex.h"
-#include "calc.h"
 
 #include <algorithm>
 
 struct Format {
     int curlyCounter = 0;
-    void printFormat(std::vector<Token>& tokens);
+    
+    void printFormat(std::vector<Token>& tokens, int curlyCounter = 0);
 };
 
 #endif

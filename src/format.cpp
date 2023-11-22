@@ -1,4 +1,5 @@
 #include "lib/format.h"
+#include "lib/calc.h"
 
 int main () {
     std::string result = "";

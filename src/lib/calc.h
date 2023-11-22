@@ -5,12 +5,12 @@
 #include "Value.h"
 #include "Function.h"
 #include "scrypt.h"
+#include "format.h"
 
 #include <map>
 #include <stdexcept>
 #include <cmath>
-
-// struct Scrypt;
+#include <algorithm>
 
 extern std::map<std::string, Value> symbTable;
 
@@ -49,8 +49,11 @@ public:
         else if (std::holds_alternative<bool>(second)){
             return std::get<bool>(second);
         }
-        else /*if (std::holds_alternative<FunctionPtr>(second))*/ {
+        else if (std::holds_alternative<FunctionPtr>(second)) {
             return std::get<FunctionPtr>(second);
+        }
+        else {
+            throw std::runtime_error("oog");
         }
         // else if (std::holds_alternative<Array>(second)){
         //     return std::get<Array>(second);
@@ -475,22 +478,29 @@ class FunctionDefNode : public ASTNode {
     public:
     std::string name;
     std::vector<Token> parameters;
-    std::vector<Token> statementBlock;
+    std::vector<Token> block;
+    Format format;
 
-    FunctionDefNode(std::string n, std::vector<Token> param, std::vector<Token> block) : name(n), parameters(param), statementBlock(block) {
+    FunctionDefNode(std::string n, std::vector<Token> param, std::vector<Token> b) : name(n), parameters(param), block(b) {
         type = "functionDef";
     }
     
     Value evaluate() override{
         return symbTable[name];
     }
-    void printInfix() override{
+    void printInfix(int& curlyCounter) {
         std::cout << name << "(";
         for (size_t i = 0; i < parameters.size() - 1; i++) {
             std::cout << parameters[i].value << ", ";
         }
-        std::cout << parameters[parameters.size() - 1].value << ")";
+        std::cout << parameters[parameters.size() - 1].value << ") {\n";
+        //print out block
+        std::reverse(block.begin(), block.end());
+        format.printFormat(block, ++curlyCounter);
+        curlyCounter--;
+        std::cout << "}\n";
     }
+    void printInfix() override {}
 };
 
 class FunctionCallNode : public ASTNode {
@@ -517,13 +527,11 @@ class FunctionCallNode : public ASTNode {
         if (arguments.size() != function->parameters.size()) {
             throw std::runtime_error("incorrect argument count.");
         }
-
-        symbTable.clear();
         for (size_t i = 0; i < arguments.size(); i++) {
             symbTable[function->parameters[i].value] = args[i];
         }
         //still unsure about this
-        scrypt.interpret(function->block);
+        // scrypt.interpret(function->block);
 
         symbTable = globalScope;
         return function;

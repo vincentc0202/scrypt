@@ -43,7 +43,7 @@ int main() {
                     if (std::holds_alternative<double>(result)) {
                         std::cout << std::get<double>(result) << '\n';
                     }
-                    else {
+                    else if (std::holds_alternative<bool>(result)) {
                         std::cout << (std::get<bool>(result) ? "true" : "false") << '\n';
                     }
                 }
