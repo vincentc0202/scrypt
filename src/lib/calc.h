@@ -524,7 +524,7 @@ class FunctionCallNode : public ASTNode {
 
         // Check argument count
         if (arguments.size() != function->parameters.size()) {
-            throw std::runtime_error("Incorrect number of arguments for function " + name);
+            throw std::runtime_error("incorrect arguments count");
         }
 
         // Create a new scope for the function call
