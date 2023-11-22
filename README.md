@@ -13,7 +13,7 @@ In Track B, we created an entirely new parser that parses human-friendly infix e
 This is Part 3 of 4 of the scrypt project. **_(11/6/23)_**  
 In this checkpoint, we added in even more operators into our calculator. We added ordered comparisons (<, <=, >, >=), equality & inequality (==, !=), and the logical and, logical XOR, and logical inclusive or operators (&, ^, |). With the addition of these operators came a new data type that is now supported, booleans! In track B, we added 3 new statements, `if, while, print` to add control flow, looping, and printing to our calculator. 
 
-This is Part 4 of 4 of the scrypt project. **_(11/12/23)_**
+This is Part 4 of 4 of the scrypt project. **_(11/12/23)_**  
 In this final checkpoint, we tried our best to implement functions and resizable arrays as features of our language. In order to do this, we updated our Value variant to include new types, such as a function, null, and arrays. We also created 3 new nodes in our `calc.h` file to represent a function definition, a function call, and a return statement. We will try our best to finish up functions and to implement arrays. 
 
 ## How to build the project:
