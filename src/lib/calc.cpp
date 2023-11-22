@@ -197,8 +197,8 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
                 if (pos < tokens.size() && tokens[pos].type_ == comma) {
                     pos++;
                     if (pos < tokens.size() && tokens[pos].type_ == closeParen) {
-                        throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
-                }
+                        throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos-1].line) + " column " + std::to_string(tokens[pos-1].column) + ": " + tokens[pos-1].value);
+                    }
                 }
 
                 size_t tempPos = 0;
