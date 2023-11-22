@@ -152,12 +152,9 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
                     tempTokens.push_back(tokens.back());
                     tokens.pop_back();
                 }   
-
-                std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
-                root->printInfix();
             }
-            
-            std::cout << ";\n";
+            std::unique_ptr<ReturnNode> returnNode = std::make_unique<ReturnNode>(tempTokens);
+            returnNode->printInfix();
         }
         else if (tokens.back().type_ == openCurlyBracket) {
             std::cout << " {\n";
@@ -187,12 +184,13 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
                 tokens.pop_back();
             }   
 
+            std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
+
             if (tokens.back().type_ != semicolon) {
                 throw UnexpToken("Unexpected token at line " + std::to_string(tokens.back().line) + " column " + std::to_string(tokens.back().column) + ": " + tokens.back().value);
             }
             
             tokens.pop_back();
-            std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
             //puts variables in the map
             Value value = root->evaluate();
             printIndents(curlyCounter);

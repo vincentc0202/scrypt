@@ -518,6 +518,11 @@ class FunctionCallNode : public ASTNode {
     Value evaluate() override {
         std::map<std::string, Value> globalScope = symbTable;
         std::vector<Value> args;
+        
+        auto functionName = symbTable.find(name);
+        if (functionName == symbTable.end()) {
+            throw std::runtime_error("not a function.");
+        }
 
         //evaluate arguments first
         for (size_t i = 0; i < arguments.size(); i++) {
@@ -551,8 +556,8 @@ class FunctionCallNode : public ASTNode {
 
 class ReturnNode : public ASTNode {
     public:
-    ReturnNode(std::unique_ptr<ASTNode> returnExpression) {
-        
+    std::vector<Token> returnExpression;
+    ReturnNode(std::vector<Token> r) : returnExpression(r) {
     }
 
     Value evaluate() override{

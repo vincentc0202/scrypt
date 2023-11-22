@@ -177,28 +177,27 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         pos++;
 
         //has to be function call here
-        if(pos < tokens.size() && tokens[pos].type_ == openParen){
-            auto name = symbTable.find(varName);
-            if (name == symbTable.end()) {
-                throw std::runtime_error("not a function.");
-            }
-
+        if (pos < tokens.size() && tokens[pos].type_ == openParen){
             //process arguments
             std::vector<std::unique_ptr<ASTNode>> arguments;
             //skip (
             pos++;
             while (pos < tokens.size() && tokens[pos].type_ != closeParen) {
                 std::vector<Token> tempArgument;
-                while (pos < tokens.size() && tokens[pos].type_ != comma) {
+                while (pos < tokens.size() && tokens[pos].type_ != comma && tokens[pos].type_ != closeParen) {
                     tempArgument.push_back(tokens[pos]);
                     pos++;
                 }
+
+                //skip comma
+                if (tokens.size() > 1 && tokens[pos+1].type_ == closeParen) {
+                    throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
+                }
+                pos++;
+
                 size_t tempPos = 0;
                 auto argumentPointer = parseExpression(tempArgument, tempPos);
                 arguments.push_back(std::move(argumentPointer));  
-
-                //skip comma
-                pos++;
             }
             //skip )
             pos++;
