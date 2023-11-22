@@ -488,7 +488,7 @@ class FunctionDefNode : public ASTNode {
     Value evaluate() override{
         return symbTable[name];
     }
-    void printInfix(int& curlyCounter) {
+    void printInfix(int& curlyCounter){
         std::cout << name << "(";
         for (size_t i = 0; i < parameters.size() - 1; i++) {
             std::cout << parameters[i].value << ", ";
@@ -501,7 +501,7 @@ class FunctionDefNode : public ASTNode {
         format.printIndents(--curlyCounter);
         std::cout << "}\n";
     }
-    void printInfix() override {}
+    void printInfix()override{}
 };
 
 class FunctionCallNode : public ASTNode {
@@ -515,45 +515,50 @@ class FunctionCallNode : public ASTNode {
     }
     
     Value evaluate() override {
-        std::map<std::string, Value> globalScope = symbTable;
-        std::vector<Value> args;
-
+        // Fetch the function from the symbol table
         auto functionName = symbTable.find(name);
         if (functionName == symbTable.end()) {
-            throw std::runtime_error("not a function.");
+            throw std::runtime_error("Function not found: " + name);
         }
+        FunctionPtr function = std::get<FunctionPtr>(functionName->second);
 
-        //evaluate arguments first
-        for (size_t i = 0; i < arguments.size(); i++) {
-            Value arg = arguments[i]->evaluate();
-            args.push_back(arg);
-        }
-
-        FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
-
+        // Check argument count
         if (arguments.size() != function->parameters.size()) {
-            throw std::runtime_error("incorrect argument count.");
+            throw std::runtime_error("Incorrect number of arguments for function " + name);
         }
-        for (size_t i = 0; i < arguments.size(); i++) {
-            symbTable[function->parameters[i].value] = args[i];
-        }
-        //still unsure about this
-        // scrypt.interpret(function->block);
 
-        //if theres a returnnode that was "created" during this interpret
+        // Create a new scope for the function call
+        std::map<std::string, Value> newScope = function->localScope;
 
-        symbTable = globalScope;
-        return function;
-    }
-    void printInfix() override{
-        std::cout << name << "(";
-        for (size_t i = 0; i < arguments.size() - 1; i++) {
-            arguments[i]->printInfix();
-            std::cout << ", ";
+        // Evaluate and assign arguments in the new scope
+        for (size_t i = 0; i < arguments.size(); ++i) {
+            Value arg = arguments[i]->evaluate();
+            newScope[function->parameters[i].value] = arg;
         }
-        arguments[arguments.size() - 1]->printInfix();
-        std::cout << ")";
-    }
+
+        // Save the current global scope
+        auto oldScope = symbTable;
+        // Set the new scope for execution
+        symbTable = newScope;
+
+        // Interpret the function body
+        // Need to handle return values and exceptions correctly -try catch method?
+        scrypt.interpret(function->block);
+        // Restore the old global scope
+        symbTable = oldScope;
+
+        // assume it returns null if no return is encountered
+        return nullptr;
+        }
+        void printInfix() override{
+            std::cout << name << "(";
+            for (size_t i = 0; i < arguments.size() - 1; i++) {
+                arguments[i]->printInfix();
+                std::cout << ", ";
+            }
+            arguments[arguments.size() - 1]->printInfix();
+            std::cout << ")";
+        }
 };
 
 class ReturnNode : public ASTNode {

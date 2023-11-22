@@ -133,7 +133,7 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
             }   
 
             std::unique_ptr<FunctionDefNode> functionDef = std::make_unique<FunctionDefNode>(funcName, parameters, block);
-            FunctionPtr function = std::make_shared<Function>(functionDef.get(), parameters, block);
+            FunctionPtr function = std::make_shared<Function>(functionDef.get(), parameters, block, symbTable);
             symbTable[funcName] = function;
             functionDef->printInfix(curlyCounter);
         }

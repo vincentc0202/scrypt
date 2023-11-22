@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <variant>
+#include <map>
 
 class FunctionDefNode;
 
@@ -15,8 +16,12 @@ class Function {
     FunctionDefNode* node;
     std::vector<Token> parameters;
     std::vector<Token> block;
+    std::map<std::string, Value> localScope;
 
-    Function(FunctionDefNode* n, std::vector<Token> p, std::vector<Token> b) : node(n), parameters(p), block(b) {
+    // Constructor implementation
+    Function(FunctionDefNode* n, std::vector<Token> p, std::vector<Token> b, const std::map<std::string, Value>& currentScope)
+        : node(n), parameters(p), block(b), localScope(currentScope) {
+        
     }
 };
 

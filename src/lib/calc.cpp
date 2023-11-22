@@ -182,6 +182,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
 
         //has to be function call here
         if (pos < tokens.size() && tokens[pos].type_ == openParen){
+            parencount++;
             //process arguments
             std::vector<std::unique_ptr<ASTNode>> arguments;
             //skip (
