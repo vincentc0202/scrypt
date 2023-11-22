@@ -1,5 +1,7 @@
 #include "lib/scrypt.h"
 
+#include "lib/calc.h"
+
 
 int main () {
     std::string result = "";

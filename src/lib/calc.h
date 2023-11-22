@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <cmath>
 
+// struct Scrypt;
+
 extern std::map<std::string, Value> symbTable;
 
 class UnexpToken : public std::runtime_error {
