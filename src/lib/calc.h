@@ -498,8 +498,7 @@ class FunctionDefNode : public ASTNode {
         //print out block
         std::reverse(block.begin(), block.end());
         format.printFormat(block, ++curlyCounter);
-        curlyCounter--;
-
+        format.printIndents(--curlyCounter);
         std::cout << "}\n";
     }
     void printInfix() override {}
@@ -518,7 +517,7 @@ class FunctionCallNode : public ASTNode {
     Value evaluate() override {
         std::map<std::string, Value> globalScope = symbTable;
         std::vector<Value> args;
-        
+
         auto functionName = symbTable.find(name);
         if (functionName == symbTable.end()) {
             throw std::runtime_error("not a function.");
@@ -531,6 +530,7 @@ class FunctionCallNode : public ASTNode {
         }
 
         FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
+
         if (arguments.size() != function->parameters.size()) {
             throw std::runtime_error("incorrect argument count.");
         }
@@ -538,7 +538,9 @@ class FunctionCallNode : public ASTNode {
             symbTable[function->parameters[i].value] = args[i];
         }
         //still unsure about this
-        scrypt.interpret(function->block);
+        // scrypt.interpret(function->block);
+
+        //if theres a returnnode that was "created" during this interpret
 
         symbTable = globalScope;
         return function;
@@ -556,16 +558,44 @@ class FunctionCallNode : public ASTNode {
 
 class ReturnNode : public ASTNode {
     public:
-    std::vector<Token> returnExpression;
-    ReturnNode(std::vector<Token> r) : returnExpression(r) {
+    std::unique_ptr<ASTNode> returnExpression;
+    ReturnNode(std::unique_ptr<ASTNode> r) : returnExpression(std::move(r)) {
     }
 
     Value evaluate() override{
-        throw std::runtime_error("not yet implment");
+        if (returnExpression == nullptr) {
+            return nullptr;
+        }
+        else {
+            return returnExpression->evaluate();
+        }
     }
 
     void printInfix() override{
+        if (returnExpression == nullptr) {
+            std::cout << "return;\n";
+        }
+        else {
+            std::cout << "return ";
+            returnExpression->printInfix();
+            std::cout << ";\n";
+        }
+    }
+};
 
+class NullNode : public ASTNode {
+    Value value;
+
+public:
+    NullNode(Value val) : value(val) {
+        type = "null";
+    }
+    void printInfix() override {
+        std::cout << "null";
+    }
+    
+    Value evaluate() override {
+        return nullptr;
     }
 };
 

@@ -172,6 +172,10 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         }
         return std::make_unique<NumberNode>(value);
     } 
+    else if (tokens[pos].type_ == null) {
+        pos++;
+        return std::make_unique<NullNode>(nullptr);
+    }
     else if (tokens[pos].type_ == identifier_) {
         std::string varName = tokens[pos].value;
         pos++;
@@ -189,11 +193,13 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
                     pos++;
                 }
 
-                //skip comma
-                if (tokens.size() > 1 && tokens[pos+1].type_ == closeParen) {
-                    throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
+                //process comma if there is one
+                if (pos < tokens.size() && tokens[pos].type_ == comma) {
+                    pos++;
+                    if (pos < tokens.size() && tokens[pos].type_ == closeParen) {
+                        throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos-1].line) + " column " + std::to_string(tokens[pos-1].column) + ": " + tokens[pos-1].value);
+                    }
                 }
-                pos++;
 
                 size_t tempPos = 0;
                 auto argumentPointer = parseExpression(tempArgument, tempPos);
