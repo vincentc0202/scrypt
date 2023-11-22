@@ -189,11 +189,13 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
                     pos++;
                 }
 
-                //skip comma
+                //process comma if there is one
                 if (tokens.size() > 1 && tokens[pos+1].type_ == closeParen) {
                     throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos].line) + " column " + std::to_string(tokens[pos].column) + ": " + tokens[pos].value);
                 }
-                pos++;
+                if (tokens[pos].type_ == comma) {
+                    pos++;
+                }
 
                 size_t tempPos = 0;
                 auto argumentPointer = parseExpression(tempArgument, tempPos);

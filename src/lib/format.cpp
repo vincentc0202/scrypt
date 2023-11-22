@@ -130,7 +130,7 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
                 }   
                 //get rid of last }
                 block.pop_back();
-            }
+            }   
 
             std::unique_ptr<FunctionDefNode> functionDef = std::make_unique<FunctionDefNode>(funcName, parameters, block);
             FunctionPtr function = std::make_shared<Function>(functionDef.get(), parameters, block);
