@@ -198,7 +198,7 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
             
             tokens.pop_back();
             //puts variables in the map
-            Value value = root->evaluate();
+            // Value value = root->evaluate();
             printIndents(curlyCounter);
             root->printInfix();
             std::cout << ";\n";

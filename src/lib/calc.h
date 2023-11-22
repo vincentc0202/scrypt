@@ -540,6 +540,8 @@ class FunctionCallNode : public ASTNode {
         //still unsure about this
         // scrypt.interpret(function->block);
 
+        //if theres a returnnode that was "created" during this interpret
+
         symbTable = globalScope;
         return function;
     }
