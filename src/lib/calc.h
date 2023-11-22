@@ -539,7 +539,7 @@ class FunctionCallNode : public ASTNode {
             symbTable[function->parameters[i].value] = args[i];
         }
         //still unsure about this
-        scrypt.interpret(function->block);
+        // scrypt.interpret(function->block);
 
         symbTable = globalScope;
         return function;
@@ -562,7 +562,12 @@ class ReturnNode : public ASTNode {
     }
 
     Value evaluate() override{
-        throw std::runtime_error("not yet implment");
+        if (returnExpression == nullptr) {
+            return nullptr;
+        }
+        else {
+            return returnExpression->evaluate();
+        }
     }
 
     void printInfix() override{
@@ -574,6 +579,22 @@ class ReturnNode : public ASTNode {
             returnExpression->printInfix();
             std::cout << ";\n";
         }
+    }
+};
+
+class NullNode : public ASTNode {
+    Value value;
+
+public:
+    NullNode(Value val) : value(val) {
+        type = "null";
+    }
+    void printInfix() override {
+        std::cout << "null";
+    }
+    
+    Value evaluate() override {
+        return nullptr;
     }
 };
 

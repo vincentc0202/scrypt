@@ -172,6 +172,10 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         }
         return std::make_unique<NumberNode>(value);
     } 
+    else if (tokens[pos].type_ == null) {
+        pos++;
+        return std::make_unique<NullNode>(nullptr);
+    }
     else if (tokens[pos].type_ == identifier_) {
         std::string varName = tokens[pos].value;
         pos++;
