@@ -140,22 +140,23 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
         else if (tokens.back().type_ == returnStatement) {
             int currentLineCounter = tokens.back().line;
             tokens.pop_back();
+            printIndents(curlyCounter);
 
-            while (tokens.back().line == currentLineCounter && tokens.back().type_ != semicolon) {
-                tempTokens.push_back(tokens.back());
-                tokens.pop_back();
-            }   
+            if (tokens.back().type_ == semicolon) {
+                std::cout << "return";
+            }
+            else {
+                std::cout << "return ";
 
-            if (tokens.back().type_ != semicolon) {
-                throw UnexpToken("Unexpected token at line " + std::to_string(tokens.back().line) + " column " + std::to_string(tokens.back().column) + ": " + tokens.back().value);
+                while (tokens.back().line == currentLineCounter && tokens.back().type_ != semicolon) {
+                    tempTokens.push_back(tokens.back());
+                    tokens.pop_back();
+                }   
+
+                std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
+                root->printInfix();
             }
             
-            tokens.pop_back();
-            printIndents(curlyCounter);
-            std::cout << "return "; 
-
-            std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
-            root->printInfix();
             std::cout << ";\n";
         }
         else if (tokens.back().type_ == openCurlyBracket) {

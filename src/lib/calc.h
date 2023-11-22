@@ -494,10 +494,12 @@ class FunctionDefNode : public ASTNode {
             std::cout << parameters[i].value << ", ";
         }
         std::cout << parameters[parameters.size() - 1].value << ") {\n";
+
         //print out block
         std::reverse(block.begin(), block.end());
         format.printFormat(block, ++curlyCounter);
         curlyCounter--;
+
         std::cout << "}\n";
     }
     void printInfix() override {}
@@ -531,7 +533,7 @@ class FunctionCallNode : public ASTNode {
             symbTable[function->parameters[i].value] = args[i];
         }
         //still unsure about this
-        // scrypt.interpret(function->block);
+        scrypt.interpret(function->block);
 
         symbTable = globalScope;
         return function;
