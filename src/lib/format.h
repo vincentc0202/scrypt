@@ -9,6 +9,7 @@
 struct Format {
     int curlyCounter = 0;
     
+    void printIndents(int counter);
     void printFormat(std::vector<Token>& tokens, int curlyCounter = 0);
 };
 

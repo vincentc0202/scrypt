@@ -498,8 +498,7 @@ class FunctionDefNode : public ASTNode {
         //print out block
         std::reverse(block.begin(), block.end());
         format.printFormat(block, ++curlyCounter);
-        curlyCounter--;
-
+        format.printIndents(--curlyCounter);
         std::cout << "}\n";
     }
     void printInfix() override {}

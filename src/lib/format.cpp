@@ -1,7 +1,7 @@
 #include "format.h"
 #include "calc.h"
 
-void printIndents(int counter) {
+void Format::printIndents(int counter) {
     if (counter == 0) {
         return;
     }
