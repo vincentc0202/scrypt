@@ -257,7 +257,6 @@ void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
                 returnNodeValue = rNode->evaluate();
             }
 
-
             //check if it is within a function
             if (tokens.back().type_ == closeCurlyBracket) return;
             else {
