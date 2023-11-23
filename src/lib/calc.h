@@ -474,6 +474,49 @@ public:
     }
 };
 
+class ReturnNode : public ASTNode {
+    public:
+    std::unique_ptr<ASTNode> returnExpression;
+    ReturnNode(std::unique_ptr<ASTNode> r) : returnExpression(std::move(r)) {
+    }
+
+    Value evaluate() override{
+        if (returnExpression == nullptr) {
+            return nullptr;
+        }
+        else {
+            return returnExpression->evaluate();
+        }
+    }
+
+    void printInfix() override{
+        if (returnExpression == nullptr) {
+            std::cout << "return;\n";
+        }
+        else {
+            std::cout << "return ";
+            returnExpression->printInfix();
+            std::cout << ";\n";
+        }
+    }
+};
+
+class NullNode : public ASTNode {
+    Value value;
+
+public:
+    NullNode(Value val) : value(val) {
+        type = "null";
+    }
+    void printInfix() override {
+        std::cout << "null";
+    }
+    
+    Value evaluate() override {
+        return nullptr;
+    }
+};
+
 class FunctionDefNode : public ASTNode {
     public:
     std::string name;
@@ -538,12 +581,25 @@ class FunctionCallNode : public ASTNode {
             symbTable[function->parameters[i].value] = args[i];
         }
         //still unsure about this
-        // scrypt.interpret(function->block);
-
-        //if theres a returnnode that was "created" during this interpret
+        // ReturnNode*& returnNode(nullptr);
+        std::unique_ptr<ReturnNode> returnNode(nullptr);
+        std::reverse(function->block.begin(), function->block.end());
+        scrypt.interpret(function->block, std::move(returnNode));
 
         symbTable = globalScope;
-        return function;
+
+        if (returnNode == nullptr) {
+            return nullptr;
+        }
+        else {
+            Value result = returnNode->evaluate();
+            //reset back to null for nested loops
+            returnNode->returnExpression = nullptr;
+            return result;
+        }
+
+        // symbTable = globalScope;
+        // return function;
     }
     void printInfix() override{
         std::cout << name << "(";
@@ -553,49 +609,6 @@ class FunctionCallNode : public ASTNode {
         }
         arguments[arguments.size() - 1]->printInfix();
         std::cout << ")";
-    }
-};
-
-class ReturnNode : public ASTNode {
-    public:
-    std::unique_ptr<ASTNode> returnExpression;
-    ReturnNode(std::unique_ptr<ASTNode> r) : returnExpression(std::move(r)) {
-    }
-
-    Value evaluate() override{
-        if (returnExpression == nullptr) {
-            return nullptr;
-        }
-        else {
-            return returnExpression->evaluate();
-        }
-    }
-
-    void printInfix() override{
-        if (returnExpression == nullptr) {
-            std::cout << "return;\n";
-        }
-        else {
-            std::cout << "return ";
-            returnExpression->printInfix();
-            std::cout << ";\n";
-        }
-    }
-};
-
-class NullNode : public ASTNode {
-    Value value;
-
-public:
-    NullNode(Value val) : value(val) {
-        type = "null";
-    }
-    void printInfix() override {
-        std::cout << "null";
-    }
-    
-    Value evaluate() override {
-        return nullptr;
     }
 };
 

@@ -39,7 +39,6 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
             std::cout << "else"; 
             tokens.pop_back();
 
-            //BRAINSTORM ABOUT ELSE IF
             if (tokens.size() > 0 && tokens.back().type_ == openCurlyBracket) {
                 continue;
             }
@@ -48,7 +47,6 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
                 curlyCounter++;
                 elifCurly = true;
                 elifCurlyCounter = curlyCounter;
-                //std::cout << elifCurlyCounter <<'\n';
             }
         }
         else if (tokens.back().type_ == whileStatement) {
@@ -198,7 +196,7 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
             
             tokens.pop_back();
             //puts variables in the map
-            // Value value = root->evaluate();
+            Value value = root->evaluate();
             printIndents(curlyCounter);
             root->printInfix();
             std::cout << ";\n";

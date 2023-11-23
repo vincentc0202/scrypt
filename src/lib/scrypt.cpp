@@ -40,9 +40,7 @@ std::unique_ptr<ASTNode> Scrypt::evalExpression(std::vector<Token>& tokens) {
     return root;
 }
 
-void Scrypt::interpret(std::vector<Token>& tokens) {
-    
-    
+void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> returnNode) {
     while (tokens.size() > 1) { 
         std::vector<Token> tempTokens;
         //std::vector<std::shared_ptr<FunctionNode>> functionList;
@@ -234,7 +232,30 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
         //NOT FINISHED YET 
         else if (tokens.back().type_ == returnStatement){
             //make sure to check if it's within a function
-            std::unique_ptr<ASTNode> returnExpression;
+            int currentLineCounter = tokens.back().line;
+            tokens.pop_back();
+
+            while (tokens.back().line == currentLineCounter && tokens.back().type_ != semicolon) {
+                tempTokens.push_back(tokens.back());
+                tokens.pop_back();
+            }   
+            //delete ;
+            tokens.pop_back();
+            
+            std::unique_ptr<ASTNode> root;
+
+            size_t pos2 = 0;
+            if (tempTokens.size() == 0) {
+                root = nullptr;
+            }
+            else {
+                root = parser.parseExpression(tempTokens, pos2);
+            }
+
+            std::unique_ptr<ReturnNode> rNode = std::make_unique<ReturnNode>(std::move(root));
+            rNode->evaluate();
+            returnNode = std::move(rNode);
+            return;
         }
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;

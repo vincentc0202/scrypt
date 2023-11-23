@@ -10,9 +10,10 @@
 #include <algorithm>
 
 class ASTNode;
+class ReturnNode;
 
 struct Scrypt {
-    void interpret(std::vector<Token>& tokens);
+    void interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> returnNode = nullptr);
     
 private:
     void deleteBlock(std::vector<Token>& tokens);
