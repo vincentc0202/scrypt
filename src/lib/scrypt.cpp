@@ -166,6 +166,7 @@ void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
             tokens.pop_back();
 
             std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
+
             Value result = root->evaluate();
 
             //printing syntax

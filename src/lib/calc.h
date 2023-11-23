@@ -596,6 +596,11 @@ class FunctionCallNode : public ASTNode {
     }
     
     Value evaluate() override {
+        auto funcName = symbTable.find(name);
+        if (funcName == symbTable.end() || !std::holds_alternative<FunctionPtr>(symbTable[name])) {
+            throw std::runtime_error("not a function.");
+        }
+
         std::map<std::string, Value> globalScope = symbTable;
         std::vector<Value> args;
 
