@@ -40,7 +40,7 @@ std::unique_ptr<ASTNode> Scrypt::evalExpression(std::vector<Token>& tokens) {
     return root;
 }
 
-void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> returnNode) {
+void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
     while (tokens.size() > 1) { 
         std::vector<Token> tempTokens;
         //std::vector<std::shared_ptr<FunctionNode>> functionList;
@@ -60,7 +60,7 @@ void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> r
                 //delete open curly, process block, delete close curly
                 tokens.pop_back();
                 while (tokens.back().type_ != closeCurlyBracket) {
-                    interpret(tokens);
+                    interpret(tokens, returnNodeValue);
                 }
                 tokens.pop_back();
 
@@ -97,7 +97,7 @@ void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> r
                             prevCondition = true;
                             tokens.pop_back();
                             while (tokens.back().type_ != closeCurlyBracket) {
-                                interpret(tokens);
+                                interpret(tokens, returnNodeValue);
                             }
                             tokens.pop_back();
                         }
@@ -113,7 +113,7 @@ void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> r
                         else {
                             tokens.pop_back();
                             while (tokens.back().type_ != closeCurlyBracket) {
-                                interpret(tokens);
+                                interpret(tokens, returnNodeValue);
                             }
                             tokens.pop_back();
                         }
@@ -138,7 +138,7 @@ void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> r
             //process braceBlock
             while (std::get<bool>(result)) {
                 tokens = braceBlock;
-                interpret(tokens);
+                interpret(tokens, returnNodeValue);
 
 
                 root = evalExpression(tempTokens);
@@ -253,9 +253,14 @@ void Scrypt::interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> r
             }
 
             std::unique_ptr<ReturnNode> rNode = std::make_unique<ReturnNode>(std::move(root));
-            rNode->evaluate();
-            returnNode = std::move(rNode);
-            return;
+            // returnNode = std::move(rNode);
+            returnNodeValue = rNode->evaluate();
+
+            //check if it is within a function
+            if (tokens.back().type_ == closeCurlyBracket) return;
+            else {
+                std::runtime_error("unexpected return.");
+            }
         }
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;

@@ -13,7 +13,7 @@ class ASTNode;
 class ReturnNode;
 
 struct Scrypt {
-    void interpret(std::vector<Token>& tokens, std::unique_ptr<ReturnNode> returnNode = nullptr);
+    void interpret(std::vector<Token>& tokens, Value& returnNodeValue);
     
 private:
     void deleteBlock(std::vector<Token>& tokens);

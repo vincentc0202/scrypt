@@ -52,15 +52,15 @@ public:
         else if (std::holds_alternative<FunctionPtr>(second)) {
             return std::get<FunctionPtr>(second);
         }
-        else {
-            throw std::runtime_error("oog");
-        }
         // else if (std::holds_alternative<Array>(second)){
         //     return std::get<Array>(second);
         // }
-        // else if (std::holds_alternative<Null>(second)){
-        //     return std::get<Null>(second);
-        // }
+        else if (std::holds_alternative<Null>(second)){
+            return std::get<Null>(second);
+        }
+        else {
+            throw std::runtime_error("oog");
+        }
     }
 
     void printInfix() override {
@@ -383,7 +383,19 @@ public:
     Value evaluate() override {
         Value lhs = left->evaluate();
         Value rhs = right->evaluate();
-        return (std::get<double>(lhs) == std::get<double>(rhs));
+
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) == std::get<bool>(rhs));
+        }
+        else if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) == std::get<double>(rhs));
+        }
+        else if ((std::holds_alternative<Null>(lhs) && std::holds_alternative<Null>(rhs))) {
+            return (std::get<Null>(lhs) == std::get<Null>(rhs));
+        }
+        else {
+            return false;
+        }
     }
 
     void printInfixOp() const override {
@@ -400,7 +412,19 @@ public:
     Value evaluate() override {
         Value lhs = left->evaluate();
         Value rhs = right->evaluate();
-        return (std::get<double>(lhs) != std::get<double>(rhs));
+
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) != std::get<bool>(rhs));
+        }
+        else if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) != std::get<double>(rhs));
+        }
+        else if ((std::holds_alternative<Null>(lhs) && std::holds_alternative<Null>(rhs))) {
+            return (std::get<Null>(lhs) != std::get<Null>(rhs));
+        }
+        else {
+            return true;
+        }
     }
 
     void printInfixOp() const override {
@@ -482,7 +506,8 @@ class ReturnNode : public ASTNode {
 
     Value evaluate() override{
         if (returnExpression == nullptr) {
-            return nullptr;
+            std::nullptr_t nullPtr = nullptr;
+            return nullPtr;
         }
         else {
             return returnExpression->evaluate();
@@ -588,26 +613,23 @@ class FunctionCallNode : public ASTNode {
         for (size_t i = 0; i < arguments.size(); i++) {
             symbTable[function->parameters[i].value] = args[i];
         }
+
         //still unsure about this
-        // ReturnNode*& returnNode(nullptr);
-        std::unique_ptr<ReturnNode> returnNode(nullptr);
+        Value returnNodeValue = nullptr;
         std::reverse(function->block.begin(), function->block.end());
-        scrypt.interpret(function->block, std::move(returnNode));
+        scrypt.interpret(function->block, returnNodeValue);
 
+        // Value result;
+        // if (returnNodeValue == nullptr) {
+        //     Value result = nullptr;
+        // }
+        // else {
+        //     Value result = returnNode->evaluate();
+        //     //reset back to null for nested loops
+        //     returnNode = nullptr;
+        // }
         symbTable = globalScope;
-
-        if (returnNode == nullptr) {
-            return nullptr;
-        }
-        else {
-            Value result = returnNode->evaluate();
-            //reset back to null for nested loops
-            returnNode->returnExpression = nullptr;
-            return result;
-        }
-
-        // symbTable = globalScope;
-        // return function;
+        return returnNodeValue;
     }
     void printInfix() override{
         std::cout << name << "(";
