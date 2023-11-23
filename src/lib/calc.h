@@ -618,18 +618,9 @@ class FunctionCallNode : public ASTNode {
         Value returnNodeValue = nullptr;
         std::reverse(function->block.begin(), function->block.end());
         scrypt.interpret(function->block, returnNodeValue);
-
-        Value result;
-        if (std::holds_alternative<Null>(returnNodeValue)) {
-            result = returnNodeValue;
-        }
-        else {
-            result = returnNodeValue;
-            //reset back to null for nested loops
-            returnNodeValue = nullptr;
-        }
+        
         symbTable = globalScope;
-        return result;
+        return returnNodeValue;
     }
     void printInfix() override{
         std::cout << name << "(";

@@ -246,19 +246,19 @@ void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
             
             std::unique_ptr<ASTNode> root;
 
-            size_t pos2 = 0;
             if (tempTokens.size() == 0) {
                 root = nullptr;
                 returnNodeValue = nullptr;
             }
             else {
+                size_t pos2 = 0;
                 root = parser.parseExpression(tempTokens, pos2);
                 std::unique_ptr<ReturnNode> rNode = std::make_unique<ReturnNode>(std::move(root));
                 returnNodeValue = rNode->evaluate();
             }
 
             //check if it is within a function
-            if (tokens.back().type_ == closeCurlyBracket) return;
+            if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
             else {
                 std::runtime_error("unexpected return.");
             }
