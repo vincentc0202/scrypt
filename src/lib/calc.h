@@ -611,11 +611,23 @@ class FunctionCallNode : public ASTNode {
     }
     void printInfix() override{
         std::cout << name << "(";
-        for (size_t i = 0; i < arguments.size() - 1; i++) {
-            arguments[i]->printInfix();
-            std::cout << ", ";
+        // for (size_t i = 0; i < arguments.size() - 1; i++) {
+        //     arguments[i]->printInfix();
+        //     std::cout << ", ";
+        // }
+        // arguments[arguments.size() - 1]->printInfix();
+        // std::cout << ")";
+
+        if (arguments.size() == 1) {
+            arguments[0]->printInfix();
         }
-        arguments[arguments.size() - 1]->printInfix();
+        else if (arguments.size() > 1) {
+            for (size_t i = 0; i < arguments.size() - 1; i++) {
+                arguments[i]->printInfix();
+                std::cout << ",";
+            }
+            arguments[arguments.size() - 1]->printInfix();
+        }
         std::cout << ")";
     }
 };
