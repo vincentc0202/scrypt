@@ -547,11 +547,11 @@ class FunctionDefNode : public ASTNode {
     std::string name;
     std::vector<Token> parameters;
     std::vector<Token> block;
-    std::map<std::string, Value> currScope;
+    // std::map<std::string, Value> currScope;
 
     Format format;
 
-    FunctionDefNode(std::string n, std::vector<Token> param, std::vector<Token> b, std::map<std::string, Value>& scope) : name(n), parameters(param), block(b), currScope(scope) {
+    FunctionDefNode(std::string n, std::vector<Token> param, std::vector<Token> b) : name(n), parameters(param), block(b) {
         type = "functionDef";
     }
     
@@ -587,11 +587,11 @@ class FunctionCallNode : public ASTNode {
     public:
     std::string name;
     std::vector<std::unique_ptr<ASTNode>> arguments;
-    std::map<std::string, Value> currScope;
+    // std::map<std::string, Value> currScope;
 
     Scrypt scrypt;
 
-    FunctionCallNode(std::string n, std::vector<std::unique_ptr<ASTNode>> args, std::map<std::string, Value>& scope) : name(n), arguments(std::move(args)), currScope(scope) {
+    FunctionCallNode(std::string n, std::vector<std::unique_ptr<ASTNode>> args) : name(n), arguments(std::move(args)){
         type = "functionCall";
     }
     
@@ -611,7 +611,7 @@ class FunctionCallNode : public ASTNode {
         }
 
         FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
-        symbTable = function->node->currScope; 
+        symbTable = function->currScope;
 
         if (arguments.size() != function->parameters.size()) {
             throw std::runtime_error("incorrect argument count.");
