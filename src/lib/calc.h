@@ -336,9 +336,9 @@ public:
     GreaterThanNode(ASTNode* l, ASTNode* r) : BinaryOpNode(l, r) {
         type = "boolOperator";
     }
-    Value lhs = left->evaluate();
-    Value rhs = right->evaluate();
     Value evaluate() override {
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
         if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
             return (std::get<double>(lhs) > std::get<double>(rhs));
         }
@@ -381,8 +381,8 @@ public:
     }
 
     Value evaluate() override {
-    Value lhs = left->evaluate();
-    Value rhs = right->evaluate();
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
         return (std::get<double>(lhs) == std::get<double>(rhs));
     }
 
@@ -398,8 +398,8 @@ public:
     }
 
     Value evaluate() override {
-    Value lhs = left->evaluate();
-    Value rhs = right->evaluate();
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
         return (std::get<double>(lhs) != std::get<double>(rhs));
     }
 

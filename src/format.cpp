@@ -28,10 +28,6 @@ int main () {
         std::cout << e.what() << std::endl;
         return 2;
     } 
-    catch (const std::runtime_error& e) {
-        std::cout << "Runtime error: " << e.what() << '\n';
-        return 3;
-    }
     
 
     return 0;

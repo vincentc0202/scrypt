@@ -189,10 +189,7 @@ void Format::printFormat(std::vector<Token>& tokens, int curlyCounter) {
             }   
 
             std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
-            // if (root->type == "assignment") {
-            //     Value value = root->evaluate();
-            // }
-
+            
             if (tokens.back().type_ != semicolon) {
                 throw UnexpToken("Unexpected token at line " + std::to_string(tokens.back().line) + " column " + std::to_string(tokens.back().column) + ": " + tokens.back().value);
             }
