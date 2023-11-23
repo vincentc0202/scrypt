@@ -208,7 +208,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
             //skip )
             pos++;
 
-            return std::make_unique<FunctionCallNode>(varName, std::move(arguments));
+            return std::make_unique<FunctionCallNode>(varName, std::move(arguments), symbTable);
         }
 
         if (pos < tokens.size() - 1 && tokens[pos].type_ == closeParen){
