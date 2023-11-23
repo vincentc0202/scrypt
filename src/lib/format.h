@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <memory>
 
-// class ReturnNode;
 
 struct Format {
     void printIndents(int counter);
