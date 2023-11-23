@@ -172,12 +172,11 @@ void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
             if (std::holds_alternative<double>(result)) {
                 std::cout << std::get<double>(result) << '\n';
             }
-            //NOV 20: AN ERROR IS BEING THROWN AROUND HERE (bad variant access) BC WE ARE NOT ACCOUNTING FOR FUNCTIONS WHEN PRINTING
             else if (std::holds_alternative<bool>(result)) {
                 std::cout << (std::get<bool>(result) ? "true" : "false") << '\n';
             }
             else if (std::holds_alternative<Null>(result)) {
-                std::cout << "null\n";
+                std::cout << "null" << '\n';
             }
 
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
@@ -250,14 +249,14 @@ void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
             size_t pos2 = 0;
             if (tempTokens.size() == 0) {
                 root = nullptr;
+                returnNodeValue = nullptr;
             }
             else {
                 root = parser.parseExpression(tempTokens, pos2);
+                std::unique_ptr<ReturnNode> rNode = std::make_unique<ReturnNode>(std::move(root));
+                returnNodeValue = rNode->evaluate();
             }
 
-            std::unique_ptr<ReturnNode> rNode = std::make_unique<ReturnNode>(std::move(root));
-            // returnNode = std::move(rNode);
-            returnNodeValue = rNode->evaluate();
 
             //check if it is within a function
             if (tokens.back().type_ == closeCurlyBracket) return;
