@@ -533,10 +533,18 @@ class FunctionDefNode : public ASTNode {
     }
     void printInfix(int& curlyCounter) {
         std::cout << name << "(";
-        for (size_t i = 0; i < parameters.size() - 1; i++) {
-            std::cout << parameters[i].value << ", ";
+        if (parameters.size() == 0) {
+            std::cout << ") {\n";
         }
-        std::cout << parameters[parameters.size() - 1].value << ") {\n";
+        else if (parameters.size() == 1) {
+            std::cout << parameters[0].value << ") {\n";
+        }
+        else {
+            for (size_t i = 0; i < parameters.size() - 1; i++) {
+                std::cout << parameters[i].value << ", ";
+            }
+            std::cout << parameters[parameters.size() - 1].value << ") {\n";
+        }
 
         //print out block
         std::reverse(block.begin(), block.end());
