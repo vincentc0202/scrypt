@@ -1,5 +1,7 @@
 #include "scrypt.h"
 
+#include "calc.h"
+
 Parser parser;
 
 void Scrypt::deleteBlock(std::vector<Token>& tokens) {
@@ -38,10 +40,10 @@ std::unique_ptr<ASTNode> Scrypt::evalExpression(std::vector<Token>& tokens) {
     return root;
 }
 
-void Scrypt::interpret(std::vector<Token>& tokens) {
-
+void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
     while (tokens.size() > 1) { 
         std::vector<Token> tempTokens;
+        //std::vector<std::shared_ptr<FunctionNode>> functionList;
         size_t pos = 0;
 
         if (tokens.back().type_ == ifStatement) {
@@ -58,7 +60,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                 //delete open curly, process block, delete close curly
                 tokens.pop_back();
                 while (tokens.back().type_ != closeCurlyBracket) {
-                    interpret(tokens);
+                    interpret(tokens, returnNodeValue);
                 }
                 tokens.pop_back();
 
@@ -95,7 +97,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                             prevCondition = true;
                             tokens.pop_back();
                             while (tokens.back().type_ != closeCurlyBracket) {
-                                interpret(tokens);
+                                interpret(tokens, returnNodeValue);
                             }
                             tokens.pop_back();
                         }
@@ -111,7 +113,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
                         else {
                             tokens.pop_back();
                             while (tokens.back().type_ != closeCurlyBracket) {
-                                interpret(tokens);
+                                interpret(tokens, returnNodeValue);
                             }
                             tokens.pop_back();
                         }
@@ -136,7 +138,7 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             //process braceBlock
             while (std::get<bool>(result)) {
                 tokens = braceBlock;
-                interpret(tokens);
+                interpret(tokens, returnNodeValue);
 
 
                 root = evalExpression(tempTokens);
@@ -164,17 +166,103 @@ void Scrypt::interpret(std::vector<Token>& tokens) {
             tokens.pop_back();
 
             std::unique_ptr<ASTNode> root = parser.parseExpression(tempTokens, pos);
+
             Value result = root->evaluate();
 
             //printing syntax
             if (std::holds_alternative<double>(result)) {
                 std::cout << std::get<double>(result) << '\n';
             }
-            else {
+            else if (std::holds_alternative<bool>(result)) {
                 std::cout << (std::get<bool>(result) ? "true" : "false") << '\n';
+            }
+            else if (std::holds_alternative<Null>(result)) {
+                std::cout << "null" << '\n';
             }
 
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
+        }
+        else if (tokens.back().type_ == functionDefinitionStatement){
+            std::string funcName;
+            std::vector<Token> parameters;
+            std::vector<Token> block;
+            //delete "def"
+            tokens.pop_back();
+
+            //process funcName; (only processes if the function identifier starts with a letter)
+            if (tokens.back().type_ == identifier_) {
+                funcName = tokens.back().value;
+                tokens.pop_back();
+            }
+            else {
+                throw std::runtime_error("not a function.");
+            }
+
+            //process parameters
+            tokens.pop_back();
+            while (tokens.back().type_ != closeParen) {
+                parameters.push_back(tokens.back());
+                tokens.pop_back();
+
+                if (tokens.back().type_ == comma) {
+                    tokens.pop_back();
+                }
+            }
+            tokens.pop_back();
+
+            //process block
+            if (tokens.back().type_ == openCurlyBracket) {
+                tokens.pop_back();
+
+                int curlyCounter = 1;
+                while (tokens.size() > 0 && curlyCounter != 0) {
+                    if (tokens.back().type_ == closeCurlyBracket)
+                        curlyCounter--;
+                    else if (tokens.back().type_ == openCurlyBracket)
+                        curlyCounter++;
+                    block.push_back(tokens.back());
+                    tokens.pop_back();
+                }   
+                //get rid of last }
+                block.pop_back();
+            }
+
+            std::unique_ptr<FunctionDefNode> functionDef = std::make_unique<FunctionDefNode>(funcName, parameters, block);
+            FunctionPtr function = std::make_shared<Function>(functionDef.get(), parameters, block, symbTable);
+            symbTable[funcName] = function;
+
+        }
+        //NOT FINISHED YET 
+        else if (tokens.back().type_ == returnStatement){
+            //make sure to check if it's within a function
+            int currentLineCounter = tokens.back().line;
+            tokens.pop_back();
+
+            while (tokens.back().line == currentLineCounter && tokens.back().type_ != semicolon) {
+                tempTokens.push_back(tokens.back());
+                tokens.pop_back();
+            }   
+            //delete ;
+            tokens.pop_back();
+            
+            std::unique_ptr<ASTNode> root;
+
+            if (tempTokens.size() == 0) {
+                root = nullptr;
+                returnNodeValue = nullptr;
+            }
+            else {
+                size_t pos2 = 0;
+                root = parser.parseExpression(tempTokens, pos2);
+                std::unique_ptr<ReturnNode> rNode = std::make_unique<ReturnNode>(std::move(root));
+                returnNodeValue = rNode->evaluate();
+            }
+
+            //check if it is within a function
+            if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
+            else {
+                std::runtime_error("unexpected return.");
+            }
         }
         else {  // if the statement is just an expression
             int currentLineCounter = tokens.back().line;

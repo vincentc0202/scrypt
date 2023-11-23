@@ -179,6 +179,18 @@ std::vector<Token> lex::tokenize(std::string input) {
                 Token token(type::printStatement, lineCounter, currentColumnCounter, word);
                 tokens.push_back(token);
             } 
+            else if (word == "def") {
+                Token token(type::functionDefinitionStatement, lineCounter, currentColumnCounter, word);
+                tokens.push_back(token);
+            } 
+            else if (word == "return") {
+                Token token(type::returnStatement, lineCounter, currentColumnCounter, word);
+                tokens.push_back(token);
+            } 
+            else if (word == "null") {
+                Token token(type::null, lineCounter, currentColumnCounter, word);
+                tokens.push_back(token);
+            } 
             else {
                 Token token(type::identifier_, lineCounter, currentColumnCounter, word);
                 tokens.push_back(token);

@@ -154,7 +154,7 @@ std::unique_ptr<ASTNode> Parser::parseMultDivMod(const std::vector<Token>& token
 
 //Deals with numbers, identifiers, and parentheses
 std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, size_t& pos){
-    
+    //auto left = parseFunctionDef(tokens, pos);
     if (pos >= tokens.size()) {
         throw std::runtime_error("Unexpected end of input");
     }
@@ -172,15 +172,46 @@ std::unique_ptr<ASTNode> Parser::parseFactor(const std::vector<Token>& tokens, s
         }
         return std::make_unique<NumberNode>(value);
     } 
+    else if (tokens[pos].type_ == null) {
+        pos++;
+        return std::make_unique<NullNode>(nullptr);
+    }
     else if (tokens[pos].type_ == identifier_) {
         std::string varName = tokens[pos].value;
         pos++;
 
-        //parencount checker
-        if(pos < tokens.size() && tokens[pos].type_ == openParen){
-            parencount++;
-        } 
-        else if (pos < tokens.size() && tokens[pos].type_ == closeParen){
+        //has to be function call here
+        if (pos < tokens.size() && tokens[pos].type_ == openParen){
+            //process arguments
+            std::vector<std::unique_ptr<ASTNode>> arguments;
+            //skip (
+            pos++;
+            while (pos < tokens.size() && tokens[pos].type_ != closeParen) {
+                std::vector<Token> tempArgument;
+                while (pos < tokens.size() && tokens[pos].type_ != comma && tokens[pos].type_ != closeParen) {
+                    tempArgument.push_back(tokens[pos]);
+                    pos++;
+                }
+
+                //process comma if there is one
+                if (pos < tokens.size() && tokens[pos].type_ == comma) {
+                    pos++;
+                    if (pos < tokens.size() && tokens[pos].type_ == closeParen) {
+                        throw UnexpToken("Unexpected token at line " + std::to_string(tokens[pos-1].line) + " column " + std::to_string(tokens[pos-1].column) + ": " + tokens[pos-1].value);
+                    }
+                }
+
+                size_t tempPos = 0;
+                auto argumentPointer = parseExpression(tempArgument, tempPos);
+                arguments.push_back(std::move(argumentPointer));  
+            }
+            //skip )
+            pos++;
+
+            return std::make_unique<FunctionCallNode>(varName, std::move(arguments));
+        }
+
+        if (pos < tokens.size() - 1 && tokens[pos].type_ == closeParen){
             parencount--;
         }
 

@@ -1,9 +1,13 @@
 #include "lib/scrypt.h"
 
+#include "lib/calc.h"
+
+
 int main () {
     std::string result = "";
     std::istream& input_stream = std::cin;
     char character;
+
 
     while (input_stream.get(character)) {
         result += character;
@@ -13,10 +17,11 @@ int main () {
     Scrypt scrypt;
 
     try {
+        Value returnNodeValue = nullptr;
+
         std::vector<Token> tokens = lexer.tokenize(result);
-        //lexer.printTokens(tokens);
         std::reverse(tokens.begin(), tokens.end());
-        scrypt.interpret(tokens);
+        scrypt.interpret(tokens, returnNodeValue);                                           
     }
     //lexer error
     catch(const std::logic_error& e){
@@ -33,5 +38,6 @@ int main () {
         return 3;
     }
     
+
     return 0;
 }

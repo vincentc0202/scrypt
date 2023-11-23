@@ -1,33 +1,32 @@
 #ifndef CALC_H
 #define CALC_H
 
-#include "Token.h" 
 #include "lex.h"
+#include "Value.h"
+#include "Function.h"
+#include "scrypt.h"
+#include "format.h"
+
 #include <map>
-#include <iostream>
-#include <vector>
 #include <stdexcept>
-#include <memory>
 #include <cmath>
-#include <variant>
+#include <algorithm>
 
-using Value = std::variant<double, bool>;
-
-class ASTNode {
-public:
-    std::string type;
-
-    virtual ~ASTNode() = default;
-    virtual Value evaluate() { return 0.0; }
-    virtual void printInfix() = 0;
-};
+extern std::map<std::string, Value> symbTable;
 
 class UnexpToken : public std::runtime_error {
 public:
     UnexpToken(const std::string& error) : std::runtime_error(error) {}
 };
 
-extern std::map<std::string, Value> symbTable;
+class ASTNode {
+public:
+    std::string type;
+
+    virtual ~ASTNode() = default;
+    virtual Value evaluate() = 0;
+    virtual void printInfix() = 0;
+};
 
 class VariableNode : public ASTNode {
     std::string name;
@@ -42,11 +41,25 @@ public:
             throw std::runtime_error("unknown identifier " + name);
         }
 
-        if (std::holds_alternative<double>(val->second)) {
-            return std::get<double>(val->second);
+        Value second = val->second;
+        
+        if (std::holds_alternative<double>(second)) {
+            return std::get<double>(second);
+        }
+        else if (std::holds_alternative<bool>(second)){
+            return std::get<bool>(second);
+        }
+        else if (std::holds_alternative<FunctionPtr>(second)) {
+            return std::get<FunctionPtr>(second);
+        }
+        // else if (std::holds_alternative<Array>(second)){
+        //     return std::get<Array>(second);
+        // }
+        else if (std::holds_alternative<Null>(second)){
+            return std::get<Null>(second);
         }
         else {
-            return std::get<bool>(val->second);
+            throw std::runtime_error("oog");
         }
     }
 
@@ -61,40 +74,40 @@ public:
 
 
 class NumberNode : public ASTNode {
-    double value;
+    Value value;
 
 public:
-    NumberNode(double val) : value(val) {
+    NumberNode(Value val) : value(val) {
         type = "number";
     }
     void printInfix() override {
-        std::cout << value;
+        std::cout << std::get<double>(value);
     }
     
     Value evaluate() override {
-        return value;
+        return std::get<double>(value);
     }
 };
 
 class BooleanNode : public ASTNode {
-    bool value;
+    Value value;
 
     public: 
-        BooleanNode(bool val) : value(val) {
+        BooleanNode(Value val) : value(val) {
             type = "boolean";
         }
 
         Value evaluate() override {
-            if (value) {
-                return true;
+            if (std::get<bool>(value)) {
+                return std::get<bool>(value);
             }
             else {
-                return false;
+                return std::get<bool>(value);
             }
         }
 
         void printInfix() override {
-            std::cout << (value ? "true" : "false");
+            std::cout << (std::get<bool>(value) ? "true" : "false");
         }
 };
 
@@ -113,6 +126,7 @@ public:
 
         auto leftName = dynamic_cast<VariableNode*>(left.get());
         Value rhs = right->evaluate();
+
         symbTable[leftName->getName()] = rhs;
         return rhs;
     }
@@ -155,8 +169,10 @@ public:
     }
 
     Value evaluate() override {
-        if (std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate())) {
-            return std::get<double>(left->evaluate()) + std::get<double>(right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
+            return std::get<double>(lhs) + std::get<double>(rhs);
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -175,8 +191,10 @@ public:
     }
 
     Value evaluate() override {
-        if (std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate())) {
-            return std::get<double>(left->evaluate()) - std::get<double>(right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
+            return std::get<double>(lhs) - std::get<double>(rhs);
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -195,8 +213,10 @@ public:
     }
 
     Value evaluate() override {
-        if (std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate())) {
-            return std::get<double>(left->evaluate()) * std::get<double>(right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
+            return std::get<double>(lhs) * std::get<double>(rhs);
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -215,12 +235,15 @@ public:
     }
 
     Value evaluate() override {
-        double rightEval = std::get<double>(right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        double rightEval = std::get<double>(rhs);
+
         if (rightEval == 0) {
             throw std::runtime_error("division by zero.");
         }
-        if (std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate())) {
-            return std::get<double>(left->evaluate()) / rightEval;
+        if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
+            return std::get<double>(lhs) / rightEval;
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -239,13 +262,20 @@ public:
     }
 
     Value evaluate() override {
-        double rightEval = std::get<double>(right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        double leftEval = std::get<double>(lhs);
+        double rightEval = std::get<double>(rhs);
+        
         if (rightEval == 0) {
             throw std::runtime_error("division by zero.");
         }
-        if (std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate())) {
-            return std::fmod(std::get<double>(left->evaluate()), rightEval);
-        }
+        if (std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs)) {
+            double result = std::fmod(leftEval, rightEval);
+            Value val;
+            val.emplace<double>(result);
+            return val;
+        }   
         else {
             throw std::runtime_error("invalid operand type.");
         }
@@ -263,8 +293,10 @@ public:
     }
 
     Value evaluate() override {
-        if ((std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate()))) {
-            return (left->evaluate() < right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) < std::get<double>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -283,8 +315,11 @@ public:
     }
 
     Value evaluate() override {
-        if ((std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate()))) {
-            return (left->evaluate() <= right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+
+        if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) <= std::get<double>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -301,10 +336,11 @@ public:
     GreaterThanNode(ASTNode* l, ASTNode* r) : BinaryOpNode(l, r) {
         type = "boolOperator";
     }
-
     Value evaluate() override {
-        if ((std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate()))) {
-            return (left->evaluate() > right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) > std::get<double>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -323,8 +359,10 @@ public:
     }
 
     Value evaluate() override {
-        if ((std::holds_alternative<double>(left->evaluate()) && std::holds_alternative<double>(right->evaluate()))) {
-            return (left->evaluate() >= right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) >= std::get<double>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -343,7 +381,21 @@ public:
     }
 
     Value evaluate() override {
-        return (left->evaluate() == right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) == std::get<bool>(rhs));
+        }
+        else if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) == std::get<double>(rhs));
+        }
+        else if ((std::holds_alternative<Null>(lhs) && std::holds_alternative<Null>(rhs))) {
+            return (std::get<Null>(lhs) == std::get<Null>(rhs));
+        }
+        else {
+            return false;
+        }
     }
 
     void printInfixOp() const override {
@@ -358,7 +410,21 @@ public:
     }
 
     Value evaluate() override {
-        return (left->evaluate() != right->evaluate());
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) != std::get<bool>(rhs));
+        }
+        else if ((std::holds_alternative<double>(lhs) && std::holds_alternative<double>(rhs))) {
+            return (std::get<double>(lhs) != std::get<double>(rhs));
+        }
+        else if ((std::holds_alternative<Null>(lhs) && std::holds_alternative<Null>(rhs))) {
+            return (std::get<Null>(lhs) != std::get<Null>(rhs));
+        }
+        else {
+            return true;
+        }
     }
 
     void printInfixOp() const override {
@@ -373,8 +439,10 @@ public:
     }
 
     Value evaluate() override {
-        if ((std::holds_alternative<bool>(left->evaluate()) && std::holds_alternative<bool>(right->evaluate()))) {
-            return (std::get<bool>(left->evaluate()) && std::get<bool>(right->evaluate()));
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) && std::get<bool>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -393,8 +461,10 @@ public:
     }
 
     Value evaluate() override {
-        if ((std::holds_alternative<bool>(left->evaluate()) && std::holds_alternative<bool>(right->evaluate()))) {
-            return (std::get<bool>(left->evaluate()) != std::get<bool>(right->evaluate()));
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) != std::get<bool>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -413,8 +483,10 @@ public:
     }
 
     Value evaluate() override {
-        if ((std::holds_alternative<bool>(left->evaluate()) && std::holds_alternative<bool>(right->evaluate()))) {
-            return (std::get<bool>(left->evaluate()) || std::get<bool>(right->evaluate()));
+        Value lhs = left->evaluate();
+        Value rhs = right->evaluate();
+        if ((std::holds_alternative<bool>(lhs) && std::holds_alternative<bool>(rhs))) {
+            return (std::get<bool>(lhs) || std::get<bool>(rhs));
         }
         else {
             throw std::runtime_error("invalid operand type.");
@@ -425,6 +497,157 @@ public:
         std::cout << " | ";
     }
 };
+
+class ReturnNode : public ASTNode {
+    public:
+    std::unique_ptr<ASTNode> returnExpression;
+    ReturnNode(std::unique_ptr<ASTNode> r) : returnExpression(std::move(r)) {
+    }
+
+    Value evaluate() override{
+        if (returnExpression == nullptr) {
+            std::nullptr_t nullPtr = nullptr;
+            return nullPtr;
+        }
+        else {
+            return returnExpression->evaluate();
+        }
+    }
+
+    void printInfix() override{
+        if (returnExpression == nullptr) {
+            std::cout << "return;\n";
+        }
+        else {
+            std::cout << "return ";
+            returnExpression->printInfix();
+            std::cout << ";\n";
+        }
+    }
+};
+
+class NullNode : public ASTNode {
+    Value value;
+
+public:
+    NullNode(Value val) : value(val) {
+        type = "null";
+    }
+    void printInfix() override {
+        std::cout << "null";
+    }
+    
+    Value evaluate() override {
+        return nullptr;
+    }
+};
+
+class FunctionDefNode : public ASTNode {
+    public:
+    std::string name;
+    std::vector<Token> parameters;
+    std::vector<Token> block;
+    // std::map<std::string, Value> currScope;
+
+    Format format;
+
+    FunctionDefNode(std::string n, std::vector<Token> param, std::vector<Token> b) : name(n), parameters(param), block(b) {
+        type = "functionDef";
+    }
+    
+    Value evaluate() override {
+        return symbTable[name];
+    }
+
+    void printInfix(int& curlyCounter) {
+        std::cout << name << "(";
+        if (parameters.size() == 0) {
+            std::cout << ") {\n";
+        }
+        else if (parameters.size() == 1) {
+            std::cout << parameters[0].value << ") {\n";
+        }
+        else {
+            for (size_t i = 0; i < parameters.size() - 1; i++) {
+                std::cout << parameters[i].value << ", ";
+            }
+            std::cout << parameters[parameters.size() - 1].value << ") {\n";
+        }
+
+        //print out block
+        std::reverse(block.begin(), block.end());
+        format.printFormat(block, ++curlyCounter);
+        format.printIndents(--curlyCounter);
+        std::cout << "}\n";
+    }
+    void printInfix() override {}
+};
+
+class FunctionCallNode : public ASTNode {
+    public:
+    std::string name;
+    std::vector<std::unique_ptr<ASTNode>> arguments;
+    // std::map<std::string, Value> currScope;
+
+    Scrypt scrypt;
+
+    FunctionCallNode(std::string n, std::vector<std::unique_ptr<ASTNode>> args) : name(n), arguments(std::move(args)){
+        type = "functionCall";
+    }
+    
+    Value evaluate() override {
+        auto funcName = symbTable.find(name);
+        if (funcName == symbTable.end() || !std::holds_alternative<FunctionPtr>(symbTable[name])) {
+            throw std::runtime_error("not a function.");
+        }
+
+        std::map<std::string, Value> globalScope = symbTable;
+        std::vector<Value> args;
+        
+        //evaluate arguments first
+        for (size_t i = 0; i < arguments.size(); i++) {
+            Value arg = arguments[i]->evaluate();
+            args.push_back(arg);
+        }
+
+        FunctionPtr function = std::get<FunctionPtr>(symbTable[name]);
+        symbTable = function->currScope;
+
+        if (arguments.size() != function->parameters.size()) {
+            throw std::runtime_error("incorrect argument count.");
+        }
+        for (size_t i = 0; i < arguments.size(); i++) {
+            symbTable[function->parameters[i].value] = args[i];
+        }
+
+        //still unsure about this
+        Value returnNodeValue = nullptr;
+        std::vector<Token> tempBlock = function->block;
+        std::reverse(function->block.begin(), function->block.end());
+
+        scrypt.interpret(function->block, returnNodeValue);
+        function->block = tempBlock;
+        
+        symbTable = globalScope;
+        return returnNodeValue;
+    }
+    void printInfix() override{
+        std::cout << name << "(";
+        if (arguments.size() == 1) {
+            arguments[0]->printInfix();
+        }
+        else if (arguments.size() > 1) {
+            for (size_t i = 0; i < arguments.size() - 1; i++) {
+                arguments[i]->printInfix();
+                std::cout << ", ";
+            }
+            arguments[arguments.size() - 1]->printInfix();
+        }
+        std::cout << ")";
+    }
+};
+
+
 
 class Parser {
  

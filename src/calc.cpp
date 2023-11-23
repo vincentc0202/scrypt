@@ -12,6 +12,7 @@ int main() {
 
         try {
             std::vector<Token> tokens = lexer.tokenize(input);
+            // lexer.printTokens(tokens);
             size_t pos = 0;
             parser.parencount = 0;
 
@@ -42,7 +43,7 @@ int main() {
                     if (std::holds_alternative<double>(result)) {
                         std::cout << std::get<double>(result) << '\n';
                     }
-                    else {
+                    else if (std::holds_alternative<bool>(result)) {
                         std::cout << (std::get<bool>(result) ? "true" : "false") << '\n';
                     }
                 }
