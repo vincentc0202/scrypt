@@ -176,6 +176,9 @@ void Scrypt::interpret(std::vector<Token>& tokens, Value& returnNodeValue) {
             else if (std::holds_alternative<bool>(result)) {
                 std::cout << (std::get<bool>(result) ? "true" : "false") << '\n';
             }
+            else if (std::holds_alternative<Null>(result)) {
+                std::cout << "null\n";
+            }
 
             if (tokens.size() > 0 && tokens.back().type_ == closeCurlyBracket) return;
         }
