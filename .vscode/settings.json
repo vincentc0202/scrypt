@@ -62,6 +62,9 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "bit": "cpp",
+        "charconv": "cpp",
+        "format": "cpp"
     }
 }

@@ -603,12 +603,7 @@ class FunctionCallNode : public ASTNode {
 
         std::map<std::string, Value> globalScope = symbTable;
         std::vector<Value> args;
-
-        auto functionName = symbTable.find(name);
-        if (functionName == symbTable.end()) {
-            throw std::runtime_error("not a function.");
-        }
-
+        
         //evaluate arguments first
         for (size_t i = 0; i < arguments.size(); i++) {
             Value arg = arguments[i]->evaluate();
@@ -627,8 +622,11 @@ class FunctionCallNode : public ASTNode {
 
         //still unsure about this
         Value returnNodeValue = nullptr;
+        std::vector<Token> tempBlock = function->block;
         std::reverse(function->block.begin(), function->block.end());
+
         scrypt.interpret(function->block, returnNodeValue);
+        function->block = tempBlock;
         
         symbTable = globalScope;
         return returnNodeValue;
